@@ -3,16 +3,21 @@ import ModuleGridTitle from '../components/ModuleGridTitle';
 
 import { MODULES } from '../data/dummy-data';
 
-function renderModuleItem(itemData) {
-  return (
-    <ModuleGridTitle
-      title={itemData.item.title}
-      color={itemData.item.color}
-      iconImage={itemData.item.iconImage}
-    />);;
-}
+function ModulesScreen({ navigation }) {
+  function renderModuleItem(itemData) {
+    function pressHandler() {
+      navigation.navigate(itemData.item.screen)
+    }
+  
+    return (
+      <ModuleGridTitle
+        title={itemData.item.title}
+        color={itemData.item.color}
+        iconImage={itemData.item.iconImage}
+        onPress={pressHandler}
+      />);
+  }
 
-function ModulesScreen() {
   return (
     <FlatList
       data={MODULES}

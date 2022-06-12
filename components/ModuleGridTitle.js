@@ -1,7 +1,7 @@
 import { Pressable, View, Text, StyleSheet, Image } from 'react-native';
 import { Platform } from 'react-native-web';
 
-function ModuleGridTitle({title, color, iconImage}) {
+function ModuleGridTitle({title, color, iconImage, onPress}) {
   return (
     <View style={styles.gridItem}>
       <Pressable
@@ -9,6 +9,7 @@ function ModuleGridTitle({title, color, iconImage}) {
         style={({ pressed }) => 
           [styles.button,
           pressed ? styles.buttonPressed : null]}
+          onPress={onPress}
       >
         <View style={[styles.innerContainer, {backgroundColor: color}]}>
           <Text style={styles.title}>{title}</Text>
