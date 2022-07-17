@@ -9,6 +9,7 @@ import PlanningScreen from './screens/PlannningScreen';
 import ProductScreen from './screens/ProductScreen';
 import SizingScreen from './screens/SizingScreen';
 import TruckLoadScreen from './screens/TruckLoadScreen';
+import TruckScreen from './screens/TruckScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name='Módulos' component={ModulesScreen} />
           <Stack.Screen name='Dimensionamiento' component={SizingScreen} />
+          <Stack.Screen name='Transporte' component={TruckScreen} />
           <Stack.Screen name='Planificación' component={PlanningScreen} />
           <Stack.Screen name='Carga' component={TruckLoadScreen} />
           <Stack.Screen name='Seguimiento' component={FollowUpScreen} />
