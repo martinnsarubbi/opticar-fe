@@ -1,17 +1,22 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-function Button({ children, onPress, mode, style }) {
+function Button({ children, onPress, style }) {
   return (
     <View style={style}>
       <Pressable
         onPress={onPress}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <View style={[styles.button, mode === 'flat' && styles.flat]}>
-          <Text style={[styles.buttonText, mode === 'flat' && styles.flatText]}>
+        <LinearGradient
+          // Background Linear Gradient
+          colors={['#90EE90', '#00c04b']}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>
             {children}
           </Text>
-        </View>
+        </LinearGradient>
       </Pressable>
     </View>
   );
@@ -21,23 +26,22 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 4,
+    borderRadius: 30,
     padding: 8,
-    backgroundColor: 'blue'
-  },
-  flat: {
-    backgroundColor: 'transparent',
+    paddingHorizontal: 86,
+    shadowColor: 'black',
+    shadowOpacity: 0.25,
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 8,
   },
   buttonText: {
     color: 'white',
     textAlign: 'center',
-  },
-  flatText: {
-    color: 'blue',
+    fontSize: 30,
+    fontWeight: 'bold'
   },
   pressed: {
     opacity: 0.75,
-    backgroundColor: 'blue',
     borderRadius: 4,
   },
 });

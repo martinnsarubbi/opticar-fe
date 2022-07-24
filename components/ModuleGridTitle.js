@@ -1,7 +1,6 @@
-import { Pressable, View, Text, StyleSheet, Image } from 'react-native';
-import { Platform } from 'react-native-web';
+import { Pressable, View, Text, StyleSheet, Platform, Image } from 'react-native';
 
-function ModuleGridTitle({title, color, iconImage, onPress}) {
+function ModuleGridTitle({title, color, onPress, indicator, unidad}) {
   return (
     <View style={styles.gridItem}>
       <Pressable
@@ -13,10 +12,8 @@ function ModuleGridTitle({title, color, iconImage, onPress}) {
       >
         <View style={[styles.innerContainer, {backgroundColor: color}]}>
           <Text style={styles.title}>{title}</Text>
-          <Image 
-            style={styles.moduleIcon}
-            source={iconImage}
-          />
+          <Text style={styles.indicatorStyle}>{indicator}</Text>
+          <Text style={styles.title}>{unidad}</Text>
         </View>
       </Pressable>
     </View>
@@ -26,23 +23,28 @@ function ModuleGridTitle({title, color, iconImage, onPress}) {
 const styles = StyleSheet.create({
   gridItem: {
     flex: 1,
-    margin: 16,
-    height: 150,
+    margin: 8,
+    height: 120,
     borderRadius: 8,
     elevation: 4,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0, 0, 0, 0.18)',
     shadowColor: 'black',
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.75,
     shadowOffset: {width: 0, height: 2},
     shadowRadius: 8,
     overflow: Platform.OS === 'android' ? 'hidden' : 'visible',
   },
+  indicatorStyle: {
+    fontWeight: 'bold',
+    fontSize: 40,
+    marginBottom: 5,
+    color: 'white',
+    textAlign: 'center'
+  },
   innerContainer: {
     flex: 1,
-    padding: 16,
+    padding: 8,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   button: {
     flex: 1,
@@ -52,12 +54,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 5,
-  },
-  moduleIcon: {
-    height: 70,
-    width: 70
+    color: 'white',
+    textAlign: 'center'
   }
 });
 
