@@ -8,29 +8,28 @@ import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
 import Input from '../../components/Input';
 import Button from '../../components/Button'
 
-function DeliveriesDetailScreen(props) {
+function NewDeliveryScreen(props) {
 
-  console.log(props.route.params.itemData);
   const [marker, setMarker] = useState({ 
-    latitude: props.route.params.itemData.customerLatitude, 
-    longitude: props.route.params.itemData.customerLongitude,
-    customerAddress: props.route.params.itemData.customerAddress,
-    productName: props.route.params.itemData.productName,
-    customerDistrict: props.route.params.itemData.customerDistrict,
-    customerProvince: props.route.params.itemData.customerProvince,
-    customerName: props.route.params.itemData.customerName,
-    customerSurname: props.route.params.itemData.customerSurname,
-    productId: props.route.params.itemData.productId,
-    productName: props.route.params.itemData.productName,
-    productCategory: props.route.params.itemData.productCategory,
-    productWeight: props.route.params.itemData.productWeight,
-    productWidth: props.route.params.itemData.productWidth,
-    productHeight: props.route.params.itemData.productHeight,
-    productLength: props.route.params.itemData.productLength,
-    productStackability: props.route.params.itemData.productStackability,
-    productFragility: props.route.params.itemData.productFragility,
-    deliveryid: props.route.params.itemData.deliveryid,
-    status: props.route.params.itemData.status,
+    latitude: '', 
+    longitude: '',
+    customerAddress: '',
+    productName: '',
+    customerDistrict: '',
+    customerProvince: '',
+    customerName: '',
+    customerSurname: '',
+    productId: '',
+    productName: '',
+    productCategory: '',
+    productWeight: '',
+    productWidth: '',
+    productHeight: '',
+    productLength: '',
+    productStackability: '',
+    productFragility: '',
+    deliveryid: '',
+    status: '',
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
@@ -45,9 +44,6 @@ function DeliveriesDetailScreen(props) {
       customerAddress: data.structured_formatting.main_text,
       customerDistrict: locationDetails.district,
       customerProvince: locationDetails.province,
-      productName: props.route.params.itemData.productName,
-      customerName: props.route.params.itemData.customerName,
-      customerSurname: props.route.params.itemData.customerSurname
     };
     setMarker(customerDetails);
     console.log(data, details);
@@ -365,4 +361,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default DeliveriesDetailScreen;
+export default NewDeliveryScreen;

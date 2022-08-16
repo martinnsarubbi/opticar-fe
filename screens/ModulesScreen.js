@@ -1,4 +1,4 @@
-import { ScrollView, View, StyleSheet, Text } from 'react-native';
+import { ScrollView, View, StyleSheet, Text, Pressable } from 'react-native';
 import ModuleGridTitle from '../components/ModuleGridTitle';
 import { LinearGradient } from 'expo-linear-gradient';
 import MapView, { Marker } from 'react-native-maps';
@@ -11,6 +11,10 @@ function ModulesScreen({ navigation }) {
 
   function sizingPressHandler(itemData) {
     navigation.navigate('Dimensionamiento')
+  }
+
+  function truckLoadPressHandler() {
+    navigation.navigate('Carga')
   }
 
   return (
@@ -37,21 +41,26 @@ function ModulesScreen({ navigation }) {
               unidad='paquetes'
             />
           </View>
-          <View
+        </LinearGradient>
+        <View
             // Background Linear Gradient
             colors={['#02aab0', '#00cdac']}
             style={styles.planificationContainer}
           >
-            <Text style={styles.salesTitle}>Planificar</Text>
+            <Text style={styles.salesTitle}>Planificar Viajes</Text>
           </View>
-        </LinearGradient>
         <LinearGradient
           // Background Linear Gradient
           colors={['#00254d', '#0055b3']}
           style={styles.truckLoadingContainer}
         >
-          <Text style={styles.truckLoadingTitle}>Carga</Text>
-          <Text style={styles.truckLoadingDescription}>Sin pedidos pendientes de carga.</Text>
+          <Pressable
+              onPress={truckLoadPressHandler}
+              style={({ pressed }) => pressed && styles.pressed}
+            >
+            <Text style={styles.truckLoadingTitle}>Carga</Text>
+            <Text style={styles.truckLoadingDescription}>Sin pedidos pendientes de carga.</Text>
+          </Pressable>
         </LinearGradient>
         <LinearGradient
           // Background Linear Gradient
@@ -105,6 +114,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 60,
     marginHorizontal: 20,
+    marginBottom: 20,
     padding: 11,
     elevation: 4,
     backgroundColor: 'rgba(0, 0, 0, 0.23)',
@@ -167,7 +177,11 @@ const styles = StyleSheet.create({
   },
   followUpDetailsContainer: {
     flexDirection: 'row',
-  }
+  },
+  pressed: {
+    opacity: 0.75,
+    borderRadius: 4,
+  },
 });
 
 

@@ -11,6 +11,8 @@ import HomeHeader from './components/HomeHeader';
 import DeliveriesScreen from './screens/deliveries/DeliveriesScreen'
 import DeliveriesDetailScreen from './screens/deliveries/DeliveriesDetailScreen';
 import BarcodeScreen from './screens/BarcodeScreen';
+import NewDeliveryScreen from './screens/deliveries/NewDeliveryScreen';
+import TruckLoadScreen from './screens/TruckLoadScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -39,10 +41,12 @@ export default function App() {
           />
           <Stack.Screen name='Entregas' component={DeliveriesScreen} />
           <Stack.Screen name='Detalle de entrega' component={DeliveriesDetailScreen} />
+          <Stack.Screen name='Nueva entrega' component={NewDeliveryScreen} />
           <Stack.Screen name='Dimensionamiento' component={SizingScreen} />
           <Stack.Screen name='Código de barras' component={BarcodeScreen} />
           <Stack.Screen name='Transporte' component={TruckScreen} />
           <Stack.Screen name='Planificacióßn' component={PlanningScreen} />
+          <Stack.Screen name='Carga' component={TruckLoadScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

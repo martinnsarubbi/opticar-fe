@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, Image, Pressable } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Icon } from '@rneui/themed';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import SearchComponent from '../../components/SearchComponent';
 import { fetchDeliveries } from '../../util/http';
 
@@ -16,7 +17,6 @@ function DeliveriesScreen({ navigation }) {
   function deliveriesPressHandler(itemData) {
     navigation.navigate('Detalle de entrega', { itemData })
   }
-  
 
   useEffect(() => {
     async function getDeliveries() {
@@ -107,6 +107,7 @@ function DeliveriesScreen({ navigation }) {
         <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
+            provider='google'
             initialRegion={{
               latitude: -34.604593,
               longitude: -58.428880,
@@ -118,6 +119,31 @@ function DeliveriesScreen({ navigation }) {
               <Marker key={index} title={item.name} coordinate={item.coordinates} />
             ))}
           </MapView>
+          <View style={styles.circleContainer}>
+            <Pressable onPress={() => {
+              navigation.navigate('Nueva entrega');
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed
+                  ? '#e2e2e2'
+                  : 'white',
+                opacity: pressed
+                  ? 0.75 : 1
+              },
+              styles.addOuterCircle
+            ]}
+
+            >
+              <View style={styles.addInnerCircle}>
+                <Icon
+                  name='plus'
+                  color='white'
+                  type='entypo'
+                />
+              </View>
+            </Pressable>
+          </View>
         </View>
         <SearchComponent onSearchEnter={(newTerm) => {
           setSearchText(newTerm);
@@ -152,7 +178,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 4,
     flexDirection: 'row',
-
     shadowColor: 'black',
     shadowOpacity: 0.75,
     shadowOffset: {width: 0, height: 2},
@@ -188,6 +213,43 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     borderRadius: 4,
     backgroundColor: 'red'
+  },
+  addInnerCircle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#4C9A2A',
+    width: 45,
+    height: 45,
+    borderRadius: 50,
+  },
+  addOuterCircle: {
+    margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#76BA1B',
+    width: 75,
+    height: 75,
+    borderRadius: 50,
+    shadowColor: 'black',
+    shadowOpacity: 0.75,
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 8,
+  },
+  circleContainer: {
+    alignSelf: 'flex-end'
+  },
+  addPressed: {
+    margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#76BA1B',
+    width: 75,
+    height: 75,
+    borderRadius: 50,
+    shadowColor: 'black',
+    shadowOpacity: 0.75,
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 8,
   },
 })
 export default DeliveriesScreen;
