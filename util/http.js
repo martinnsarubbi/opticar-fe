@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { CURRENT_HOST } from '../environment';
 
-const BACKEND_URL = 'http://192.168.0.10:8080/api'
+const BACKEND_URL = CURRENT_HOST + '/api'
 
 export async function storeProduct(productData) {
   console.log(productData)
