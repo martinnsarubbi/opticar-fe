@@ -1,8 +1,8 @@
-# Opticar Front End
+# Opticar Front End Mobile
 
 ## Información general
 
-Este proyecto contiene el Front End de Opticar.
+Este proyecto contiene el Front End Mobile de Opticar.
 
 ## Tecnologías usadas
 

@@ -37,8 +37,8 @@ export async function fetchDeliveries() {
       customerName: response.data[key].customer.name,
       customerSurname: response.data[key].customer.surname,
       customerAddress: response.data[key].customer.address,
-      customerLongitude: response.data[key].customer.longitude,
-      customerLatitude: response.data[key].customer.latitude,
+      customerLongitude: parseFloat(response.data[key].customer.longitude),
+      customerLatitude: parseFloat(response.data[key].customer.latitude),
       customerDistrict: response.data[key].customer.district,
       customerProvince: response.data[key].customer.province,
       productName: response.data[key].product.productName,
@@ -52,6 +52,7 @@ export async function fetchDeliveries() {
       productFragility: response.data[key].product.fragility,
       searchField: response.data[key].product.productName + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province
     }
+    console.log(deliveryObj)
     deliveries.push(deliveryObj);
   }
   return deliveries;
