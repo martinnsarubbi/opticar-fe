@@ -60,10 +60,10 @@ function NewDeliveryScreen(props) {
           style={styles.map}
           provider='google'
           initialRegion={{
-            latitude: marker.latitude,
-            longitude: marker.longitude,
-            latitudeDelta: 0.0059,
-            longitudeDelta: 0.0059,
+            latitude: -34.604593,
+            longitude: -58.428880,
+            latitudeDelta: 0.1822,
+            longitudeDelta: 0.0421,
           }}
           >
           <Marker coordinate={{ latitude: marker.latitude, longitude: marker.longitude}}/>
