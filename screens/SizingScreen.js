@@ -21,8 +21,6 @@ function SizingScreen({ navigation, route }) {
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
 
-  console.log(route.params)
-
   useEffect(() => {
     if (route.params?.data) {
       console.log(route.params.data);

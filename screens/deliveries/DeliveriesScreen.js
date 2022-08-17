@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, Image, Pressable } from 'react-native';
-import { Icon } from '@rneui/themed';
+import AddButton from '../../components/AddButton';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import SearchComponent from '../../components/SearchComponent';
 import { fetchDeliveries } from '../../util/http';
@@ -22,7 +22,7 @@ function DeliveriesScreen({ navigation }) {
     async function getDeliveries() {
       setIsFetching(true);
       try {
-        const deliveries = await fetchDeliveries();
+        const deliveries = await fetchDeliveries(true, true);
 
         const markers = [];
         for(const key in deliveries) {
@@ -83,7 +83,6 @@ function DeliveriesScreen({ navigation }) {
       },
       styles.rowContainer
     ]}
-
     >
       <View style={styles.rowLeft}>
         <Image 
@@ -93,7 +92,7 @@ function DeliveriesScreen({ navigation }) {
       </View>
       <View style={styles.rowMiddle}>
         <Text style={styles.productText}>{item.productName}</Text>
-        <Text style={styles.locationText}>{item.customerDistrict}, {item.customerProvince}</Text>
+        <Text numberOfLines={1} style={styles.locationText}>{item.customerDistrict}, {item.customerProvince}</Text>
       </View>
       <View style={styles.rowRight}>
         <Text style={styles.volumeText}>{item.productHeight * item.productWidth * item.productLength / 1000000} m2</Text>
@@ -119,31 +118,6 @@ function DeliveriesScreen({ navigation }) {
               <Marker key={index} title={item.name} coordinate={item.coordinates} />
             ))}
           </MapView>
-          <View style={styles.circleContainer}>
-            <Pressable onPress={() => {
-              navigation.navigate('Nueva entrega');
-            }}
-            style={({ pressed }) => [
-              {
-                backgroundColor: pressed
-                  ? '#e2e2e2'
-                  : 'white',
-                opacity: pressed
-                  ? 0.75 : 1
-              },
-              styles.addOuterCircle
-            ]}
-
-            >
-              <View style={styles.addInnerCircle}>
-                <Icon
-                  name='plus'
-                  color='white'
-                  type='entypo'
-                />
-              </View>
-            </Pressable>
-          </View>
         </View>
         <SearchComponent onSearchEnter={(newTerm) => {
           setSearchText(newTerm);
@@ -154,6 +128,7 @@ function DeliveriesScreen({ navigation }) {
           extraData={flatItems}
           keyExtractor={item => item.key}
         />
+        <AddButton navigation={navigation} navigationScreen='Nueva entrega' />
       </View>
     </View>
   );
@@ -213,30 +188,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     borderRadius: 4,
     backgroundColor: 'red'
-  },
-  addInnerCircle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#4C9A2A',
-    width: 45,
-    height: 45,
-    borderRadius: 50,
-  },
-  addOuterCircle: {
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#76BA1B',
-    width: 75,
-    height: 75,
-    borderRadius: 50,
-    shadowColor: 'black',
-    shadowOpacity: 0.75,
-    shadowOffset: {width: 0, height: 2},
-    shadowRadius: 8,
-  },
-  circleContainer: {
-    alignSelf: 'flex-end'
   },
   addPressed: {
     margin: 10,

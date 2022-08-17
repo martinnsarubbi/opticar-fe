@@ -2,20 +2,40 @@ import { ScrollView, View, StyleSheet, Text, Pressable } from 'react-native';
 import ModuleGridTitle from '../components/ModuleGridTitle';
 import { LinearGradient } from 'expo-linear-gradient';
 import MapView, { Marker } from 'react-native-maps';
+import { useState, useEffect } from 'react';
+import { fetchDeliveries } from '../util/http';
 
 function ModulesScreen({ navigation }) {
 
-  function deliveriesPressHandler(itemData) {
+  const [sizingPending, setSizingPending] = useState(0);
+  const [deliveryPending, setDeliveryPending] = useState(0);
+  const [error, setError] = useState();
+
+  function deliveriesPressHandler() {
     navigation.navigate('Entregas')
   }
 
-  function sizingPressHandler(itemData) {
-    navigation.navigate('Dimensionamiento')
+  function sizingPressHandler() {
+    navigation.navigate('Dimensionamiento de productos')
   }
 
   function truckLoadPressHandler() {
     navigation.navigate('Carga')
   }
+
+  useEffect(() => {
+    async function getDeliveryIndicators() {
+      try {
+        const deliveries = await fetchDeliveries(true, true);
+        setDeliveryPending(deliveries.filter((obj) => obj.status === 'Pendiente de planificar').length)
+        setSizingPending(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar').length)
+      } catch(error) {
+        setError('No se pudieron obtener las entregas.')
+      }
+    }
+    getDeliveryIndicators();
+  }, []);
+
 
   return (
     <ScrollView>
@@ -28,16 +48,16 @@ function ModulesScreen({ navigation }) {
           <Text style={styles.salesTitle}>Pedidos</Text>
           <View style={styles.salesDetailsContainer}>
             <ModuleGridTitle
-              title='Entregar'
-              onPress={deliveriesPressHandler}
-              indicator='82'
-              unidad='paquetes'
-            />
-            <ModuleGridTitle
               title='Dimensionar'
               backgroundColor='transparent'
               onPress={sizingPressHandler}
-              indicator='37'
+              indicator={sizingPending}
+              unidad='paquetes'
+            />
+            <ModuleGridTitle
+              title='Entregar'
+              onPress={deliveriesPressHandler}
+              indicator={deliveryPending}
               unidad='paquetes'
             />
           </View>

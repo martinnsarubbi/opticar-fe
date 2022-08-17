@@ -16,9 +16,15 @@ function BarcodeScreen({ navigation, route } ) {
   const handleBarCodeScanned = ({ data }) => {
     setScanned(true);
     Alert.alert('Código de barras escaneado correctamente',`${data}`);
-    route.params.inputValues.barcode = data;
-    const navigationParams = route.params.inputValues;
-    navigation.navigate('Dimensionamiento', { navigationParams })
+    if(route.params.inputValues === undefined) {
+      route.params.searchText = data;
+      const navigationParams = route.params.searchText;
+      navigation.navigate('Dimensionamiento de productos', { navigationParams })
+    } else if (route.params.searchText === undefined){
+      route.params.inputValues.barcode = data;
+      const navigationParams = route.params.inputValues;
+      navigation.navigate('Dimensionamiento', { navigationParams })
+    }
   };
 
   if (hasPermission === false) {

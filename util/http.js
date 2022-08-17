@@ -4,9 +4,7 @@ import { CURRENT_HOST } from '../environment';
 const BACKEND_URL = CURRENT_HOST + '/api'
 
 export async function storeProduct(productData) {
-  console.log(productData)
   const response = await axios.post(BACKEND_URL + '/api/products', productData);
-  console.log("Pero a q costo.............")
   const id = response.data.id;
   return id;
 }
@@ -24,8 +22,16 @@ export async function fetchProducts() {
   return products;
 }
 
-export async function fetchDeliveries() {
-  const url = BACKEND_URL + '/deliveries?status1=A Entregar&status2=Falta Dimensionar'
+
+export async function fetchDeliveries(planningPending, sizingPending ) {
+  let url = BACKEND_URL + '/deliveries?status1='
+  if (planningPending === true && sizingPending === true) {
+    url = url + 'Pendiente de planificar&status2=Pendiente de dimensionar'
+  } else if (planningPending === true && sizingPending === false) {
+    url = url + 'Pendiente de planificar'
+  } else if (planningPending === false && sizingPending === true) {
+    url = url + 'Pendiente de dimensionar'
+  }
   console.log(url)
   const response = await axios.get(url);
   const deliveries = [];
@@ -50,9 +56,8 @@ export async function fetchDeliveries() {
       productLength: response.data[key].product.length,
       productStackability: response.data[key].product.stackability,
       productFragility: response.data[key].product.fragility,
-      searchField: response.data[key].product.productName + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province
+      searchField: response.data[key].product.productName + ',' + response.data[key].product.id + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province
     }
-    console.log(deliveryObj)
     deliveries.push(deliveryObj);
   }
   return deliveries;
