@@ -4,6 +4,7 @@ import Input from '../components/Input';
 import { useState, useEffect } from 'react';
 import SearchComponent from '../components/SearchComponent';
 import { fetchDeliveries } from '../util/http';
+import AddButton from '../components/AddButton';
 
 function SizingItemsScreen({ navigation, route }) {
 
@@ -149,7 +150,8 @@ function SizingItemsScreen({ navigation, route }) {
         renderItem={renderItem}
         extraData={flatItems}
         keyExtractor={item => item.key}
-      />  
+      />
+      <AddButton navigation={navigation} navigationScreen='Dimensionamiento de nuevo producto' />
     </View>
   );
 }

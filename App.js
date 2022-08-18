@@ -43,10 +43,10 @@ export default function App() {
           <Stack.Screen name='Entregas' component={DeliveriesScreen} />
           <Stack.Screen name='Detalle de entrega' component={DeliveriesDetailScreen} />
           <Stack.Screen name='Nueva entrega' component={NewDeliveryScreen} />
-          <Stack.Screen name='Dimensionamiento' component={SizingScreen} />
+          <Stack.Screen name='Dimensionamiento de nuevo producto' component={SizingScreen} />
           <Stack.Screen name='Código de barras' component={BarcodeScreen} />
           <Stack.Screen name='Transporte' component={TruckScreen} />
-          <Stack.Screen name='Planificacióßn' component={PlanningScreen} />
+          <Stack.Screen name='Planificación' component={PlanningScreen} />
           <Stack.Screen name='Carga' component={TruckLoadScreen} />
           <Stack.Screen name='Dimensionamiento de productos' component={SizingItemsScreen} />
         </Stack.Navigator>
