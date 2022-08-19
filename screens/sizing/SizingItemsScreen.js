@@ -59,9 +59,10 @@ function SizingItemsScreen({ navigation, route }) {
     getBarcodeOnSearchField();
   }, [route?.params?.navigationParams]);
 
-  
-
-  
+  function deliveriesPressHandler(itemData) {
+    itemData.screen = 'SizingItemsScreen'
+    navigation.navigate('Dimensionamiento de nuevo producto', { itemData })
+  }
 
   function barcodePressHandler() {
     navigation.navigate('Código de barras', { searchText });

@@ -25,8 +25,6 @@ function BarcodeScreen({ navigation, route } ) {
       const navigationParams = route.params.inputValues;
       if (route.params.inputValues.screen === 'NewDeliveryScreen') {
         navigation.navigate('Nueva entrega', { navigationParams })
-      } else {
-        navigation.navigate('Dimensionamiento', { navigationParams })
       }
     }
   };

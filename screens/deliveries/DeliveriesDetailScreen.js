@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { GOOGLE_API_KEY } from '../../environment';
 import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
 import Input from '../../components/Input';
-import Button from '../../components/Button'
 
 function DeliveriesDetailScreen(props, { navigation }) {
   const [marker, setMarker] = useState({ 
@@ -26,17 +23,15 @@ function DeliveriesDetailScreen(props, { navigation }) {
     productWidth: props.route.params.itemData.productWidth.toString(),
     productHeight: props.route.params.itemData.productHeight.toString(),
     productLength: props.route.params.itemData.productLength.toString(),
-    productStackability: props.route.params.itemData.productStackability,
+    productStackability: (props.route.params.itemData.productStackability === 'Si') ? true : false,
     productFragility: (props.route.params.itemData.productFragility === 'Si') ? true : false,
-    deliveryid: (props.route.params.itemData.deliveryid === 'Si') ? true : false,
+    deliveryid: props.route.params.itemData.deliveryid,
     status: props.route.params.itemData.status,
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
 
   const onPress = (data, details) => {
-    console.log(data);
-    console.log(data.structured_formatting)
     const locationDetails = getLocationDetailsFromGoogleMapsJSON(details);
     const customerDetails = {
       latitude: details.geometry.location.lat,
@@ -70,7 +65,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
       </View>
       <ScrollView style={{width: '100%'}}>
         <View style={styles.titleContainer}>
-          <Text style={styles.sectionTitle}>Cliente del pedido nro. {marker.deliveryid}</Text>
+          <Text style={styles.sectionTitle}>Cliente de la entrega nro. {marker.deliveryid}</Text>
         </View>
         <View style={styles.inputRow}>
           <Input

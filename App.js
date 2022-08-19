@@ -34,7 +34,7 @@ export default function App() {
       <NavigationContainer theme={MyTheme}>
         <Stack.Navigator>
           <Stack.Screen 
-            name='Módulos'
+            name='Inicio'
             component={ModulesScreen}
             options={{
               headerTitle: (props) => <HomeHeader/>

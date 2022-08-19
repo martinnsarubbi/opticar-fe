@@ -8,15 +8,16 @@ import { storeProduct } from '../../util/http';
 
 function SizingScreen({ navigation, route }) {
   const[inputValues, setInputValues] = useState({
-    barcode: '',
-    productName: '',
-    height: '',
-    length: '',
-    weight: '',
-    width: ''
+    barcode: (route.params?.itemData?.productId.length > 1) ? route.params?.itemData?.productId : '',
+    productName: (route.params?.itemData?.productName.length > 1) ? route.params?.itemData?.productName : '',
+    height: (route.params?.itemData?.productHeight > 0) ? route.params?.itemData?.productHeight.toString() : '',
+    length: (route.params?.itemData?.productLength > 0) ? route.params?.itemData?.productLength.toString() : '',
+    weight: (route.params?.itemData?.productWeight > 0) ? route.params?.itemData?.productWeight.toString() : '',
+    width: (route.params?.itemData?.productWidth > 0) ? route.params?.itemData?.productWidth.toString() : ''
   });
-  const [fragility, setFragility] = useState(false);
-  const [stackability, setStackability] = useState(false);
+
+  const [fragility, setFragility] = useState((route.params?.itemData?.productFragility) ? route.params?.itemData?.productFragility : false);
+  const [stackability, setStackability] = useState((route.params?.itemData?.productStackability) ? route.params?.itemData?.productStackability : false);
   const [ocrTooltipOpen, setOcrTooltipOpen] = useState(false); 
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
@@ -57,7 +58,7 @@ function SizingScreen({ navigation, route }) {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <View style={styles.titleContainer}>
-          <Text style={styles.sectionTitle}>Nuevo producto</Text>
+          <Text style={styles.sectionTitle}>Ingrese las dimensiones</Text>
           <View style={styles.ocrComponent}>
             <Icon
               name='ocr'
@@ -265,7 +266,7 @@ function SizingScreen({ navigation, route }) {
           </View>
         </View>
         <Button style={styles.button} onPress={submitHandler}>
-          Agregar
+          Confirmar
         </Button>
       </View>
     </View>
@@ -289,7 +290,8 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontSize: 22,
     fontWeight: 'bold',
-    paddingHorizontal: 50
+    paddingHorizontal: 20,
+    paddingTop: 4
   },
   allInputRow: {
     flex: 1

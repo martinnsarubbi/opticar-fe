@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, Image, Pressable } from 'react-native';
 import AddButton from '../../components/AddButton';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import SearchComponent from '../../components/SearchComponent';
 import { fetchDeliveries } from '../../util/http';
 

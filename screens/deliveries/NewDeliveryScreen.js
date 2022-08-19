@@ -54,18 +54,20 @@ function NewDeliveryScreen({ navigation }) {
                   x.productId.includes(inputValues.barcode)
             )
           : null;
-        if(searchFilteredData[0] != null) {
-          setInputValues((curInputValues) => ({
-            ...curInputValues,
-            description: searchFilteredData[0].productName,
-            category: searchFilteredData[0].productCategory,
-            weight: searchFilteredData[0].productWeight.toString(),
-            width: searchFilteredData[0].productWidth.toString(),
-            height: searchFilteredData[0].productHeight.toString(),
-            large: searchFilteredData[0].productLength.toString(),
-            stackability: searchFilteredData[0].productStackability,
-            fragility: searchFilteredData[0].productFragility,
-          }))
+        if(searchFilteredData != null) {
+          if(searchFilteredData[0] != null) {
+            setInputValues((curInputValues) => ({
+              ...curInputValues,
+              description: searchFilteredData[0].productName,
+              category: searchFilteredData[0].productCategory,
+              weight: searchFilteredData[0].productWeight.toString(),
+              width: searchFilteredData[0].productWidth.toString(),
+              height: searchFilteredData[0].productHeight.toString(),
+              large: searchFilteredData[0].productLength.toString(),
+              stackability: searchFilteredData[0].productStackability,
+              fragility: searchFilteredData[0].productFragility,
+            }))
+          }
         }
       } catch(error) {
         console.log(error)
