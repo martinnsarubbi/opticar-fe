@@ -1,15 +1,17 @@
 import axios from 'axios';
 import { CURRENT_HOST } from '../environment';
 
-const BACKEND_URL = CURRENT_HOST + '/api'
+const BACKEND_URL = CURRENT_HOST
 
 export async function storeProduct(productData) {
+  console.log(BACKEND_URL + '/api/products', productData)
   const response = await axios.post(BACKEND_URL + '/api/products', productData);
   const id = response.data.id;
   return id;
 }
 
 export async function fetchProducts() {
+  console.log(BACKEND_URL + '/api/products')
   const response = await axios.get(BACKEND_URL + '/api/products');
   const products = [];
   for(const id in response.data) {
@@ -24,7 +26,7 @@ export async function fetchProducts() {
 
 
 export async function fetchDeliveries(planningPending, sizingPending ) {
-  let url = BACKEND_URL + '/deliveries?status1='
+  let url = BACKEND_URL + '/api/deliveries?status1='
   if (planningPending === true && sizingPending === true) {
     url = url + 'Pendiente de planificar&status2=Pendiente de dimensionar'
   } else if (planningPending === true && sizingPending === false) {
@@ -43,6 +45,8 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
       customerName: response.data[key].customer.name,
       customerSurname: response.data[key].customer.surname,
       customerAddress: response.data[key].customer.address,
+      customerDni: response.data[key].customer.id.toString(),
+      customerTelephone: response.data[key].customer.telephone,
       customerLongitude: parseFloat(response.data[key].customer.longitude),
       customerLatitude: parseFloat(response.data[key].customer.latitude),
       customerDistrict: response.data[key].customer.district,
@@ -58,7 +62,22 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
       productFragility: response.data[key].product.fragility,
       searchField: response.data[key].product.productName + ',' + response.data[key].product.id + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province
     }
+    deliveryObj.productWeight = (deliveryObj.productWeight === 0) ? '' : deliveryObj.productWeight;
+    deliveryObj.productWidth = (deliveryObj.productWidth === 0) ? '' : deliveryObj.productWidth;
+    deliveryObj.productHeight = (deliveryObj.productHeight === 0) ? '' : deliveryObj.productHeight;
+    deliveryObj.productLength = (deliveryObj.productLength === 0) ? '' : deliveryObj.productLength;
+    deliveryObj.productFragility = (deliveryObj.productFragility === 'true') ? true : false;
+    deliveryObj.productStackability = (deliveryObj.productStackability === 'true') ? true : false;
     deliveries.push(deliveryObj);
   }
   return deliveries;
+}
+
+export async function storeDelivery(deliveryData) {
+  console.log(BACKEND_URL + '/api/bulk-upload')
+  const deliveryDataList = []
+  deliveryDataList.push(deliveryData)
+  const response = await axios.post(BACKEND_URL + '/api/bulk-upload', deliveryDataList);
+  const id = response.data.id;
+  return id;
 }
