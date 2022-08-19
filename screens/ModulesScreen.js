@@ -1,9 +1,5 @@
 import { ScrollView, View, StyleSheet, Text, Pressable } from 'react-native';
-import ModuleGridTitle from '../components/ModuleGridTitle';
 import { LinearGradient } from 'expo-linear-gradient';
-import MapView, { Marker } from 'react-native-maps';
-import { useState, useEffect } from 'react';
-import { fetchDeliveries } from '../util/http';
 
 function ModulesScreen({ navigation }) {
 

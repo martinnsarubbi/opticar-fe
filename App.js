@@ -4,16 +4,16 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import ModulesScreen from './screens/ModulesScreen';
-import PlanningScreen from './screens/PlannningScreen';
-import SizingScreen from './screens/SizingScreen';
-import TruckScreen from './screens/TruckScreen';
+import PlanningScreen from './screens/planning/PlannningScreen';
+import SizingScreen from './screens/sizing/SizingScreen';
+import TruckScreen from './screens/planning/TruckScreen';
 import HomeHeader from './components/HomeHeader';
 import DeliveriesScreen from './screens/deliveries/DeliveriesScreen'
 import DeliveriesDetailScreen from './screens/deliveries/DeliveriesDetailScreen';
-import BarcodeScreen from './screens/BarcodeScreen';
+import BarcodeScreen from './screens/sizing/BarcodeScreen';
 import NewDeliveryScreen from './screens/deliveries/NewDeliveryScreen';
-import TruckLoadScreen from './screens/TruckLoadScreen';
-import SizingItemsScreen from './screens/SizingItemsScreen';
+import TruckLoadScreen from './screens/truck-loading/TruckLoadScreen';
+import SizingItemsScreen from './screens/sizing/SizingItemsScreen';
 
 
 const Stack = createNativeStackNavigator();

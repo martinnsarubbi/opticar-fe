@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
 import { View, Text, StyleSheet, Pressable  } from 'react-native';
-import Input from '../components/Input';
-import Button from '../components/Button'
-import { storeProduct } from '../util/http';
+import Input from '../../components/Input';
+import Button from '../../components/Button'
+import { storeProduct } from '../../util/http';
 
 
 function SizingScreen({ navigation, route }) {

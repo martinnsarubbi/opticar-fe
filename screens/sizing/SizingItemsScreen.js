@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, FlatList, Image, Pressable } from 'react-native';
 import { Chip, Icon } from '@rneui/themed';
-import Input from '../components/Input';
+import Input from '../../components/Input';
 import { useState, useEffect } from 'react';
-import SearchComponent from '../components/SearchComponent';
-import { fetchDeliveries } from '../util/http';
-import AddButton from '../components/AddButton';
+import SearchComponent from '../../components/SearchComponent';
+import { fetchDeliveries } from '../../util/http';
+import AddButton from '../../components/AddButton';
 
 function SizingItemsScreen({ navigation, route }) {
 
@@ -100,7 +100,7 @@ function SizingItemsScreen({ navigation, route }) {
         <View style={styles.rowLeft}>
           <Image 
             style={styles.imageStyle}
-            source={require('../assets/box.png')}
+            source={require('../../assets/box.png')}
           />
         </View>
         <View style={styles.rowMiddle}>
