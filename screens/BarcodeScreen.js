@@ -23,7 +23,11 @@ function BarcodeScreen({ navigation, route } ) {
     } else if (route.params.searchText === undefined){
       route.params.inputValues.barcode = data;
       const navigationParams = route.params.inputValues;
-      navigation.navigate('Dimensionamiento', { navigationParams })
+      if (route.params.inputValues.screen === 'NewDeliveryScreen') {
+        navigation.navigate('Nueva entrega', { navigationParams })
+      } else {
+        navigation.navigate('Dimensionamiento', { navigationParams })
+      }
     }
   };
 

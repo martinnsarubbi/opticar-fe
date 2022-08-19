@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -7,50 +7,109 @@ import { GOOGLE_API_KEY } from '../../environment';
 import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
 import Input from '../../components/Input';
 import Button from '../../components/Button'
+import { LogBox } from 'react-native';
+import { storeDelivery, fetchDeliveries } from '../../util/http';
 
-function NewDeliveryScreen(props) {
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.']);
 
-  const [marker, setMarker] = useState({ 
-    latitude: '', 
-    longitude: '',
-    customerAddress: '',
-    productName: '',
-    customerDistrict: '',
-    customerProvince: '',
-    customerName: '',
-    customerSurname: '',
-    productId: '',
-    productName: '',
-    productCategory: '',
-    productWeight: '',
-    productWidth: '',
-    productHeight: '',
-    productLength: '',
-    productStackability: '',
-    productFragility: '',
-    deliveryid: '',
-    status: '',
+function NewDeliveryScreen({ navigation }) {
+
+  const [region, setRegion] = useState({
+    latitude: -34.604593,
+    longitude: -58.428880,
+    latitudeDelta: 0.1822,
+    longitudeDelta: 0.0421,
+  })
+  const [inputValues, setInputValues] = useState({ 
+    latitude: 0, 
+    longitude: 0,
+    address: '',
+    description: '',
+    neighborhood: '',
+    province: '',
+    name: '',
+    surname: '',
+    dni: '',
+    telephone: '',
+    barcode: '',
+    description: '',
+    category: '',
+    weight: '',
+    width: '',
+    height: '',
+    large: '',
+    stackability: false,
+    fragility: false,
+    screen: 'NewDeliveryScreen'
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
 
-  const onPress = (data, details) => {
-    console.log(data);
-    console.log(data.structured_formatting)
+  useEffect(() => {
+    async function updateProduct() {
+      try {
+        let deliveries = await fetchDeliveries(true, true);
+        const searchFilteredData = inputValues.barcode
+          ? deliveries.filter((x) =>
+                  x.productId.includes(inputValues.barcode)
+            )
+          : null;
+        if(searchFilteredData[0] != null) {
+          setInputValues((curInputValues) => ({
+            ...curInputValues,
+            description: searchFilteredData[0].productName,
+            category: searchFilteredData[0].productCategory,
+            weight: searchFilteredData[0].productWeight.toString(),
+            width: searchFilteredData[0].productWidth.toString(),
+            height: searchFilteredData[0].productHeight.toString(),
+            large: searchFilteredData[0].productLength.toString(),
+            stackability: searchFilteredData[0].productStackability,
+            fragility: searchFilteredData[0].productFragility,
+          }))
+        }
+      } catch(error) {
+        console.log(error)
+      }
+    }
+    updateProduct();
+  }, [inputValues.barcode]);
+
+  const onPress = (data, details) => {    
     const locationDetails = getLocationDetailsFromGoogleMapsJSON(details);
-    const customerDetails = {
+
+    setRegion({
       latitude: details.geometry.location.lat,
       longitude: details.geometry.location.lng,
-      customerAddress: data.structured_formatting.main_text,
-      customerDistrict: locationDetails.district,
-      customerProvince: locationDetails.province,
-    };
-    setMarker(customerDetails);
-    console.log(data, details);
-    console.log(locationDetails);
-    //setRegion(details.geometry.location);
-    //setMarker(details.geometry.location);
+      latitudeDelta: 0.0059,
+      longitudeDelta: 0.0059,
+    })
+
+    setInputValues((curInputValues) => ({
+      ...curInputValues,
+      latitude: details.geometry.location.lat,
+      longitude: details.geometry.location.lng,
+      address: data.structured_formatting.main_text,
+      neighborhood: locationDetails.district,
+      province: locationDetails.province,
+    }))
   };
+
+  function inputChangedHandler(inputIdentifier, enteredValue) {
+    setInputValues((curInputValues) => {
+      return {
+        ...curInputValues,
+        [inputIdentifier]: enteredValue
+      };
+    });
+  }
+
+  function barcodePressHandler() {
+    navigation.navigate('Código de barras', { inputValues } );
+  }
+
+  async function submitHandler() {
+    const id = await storeDelivery(inputValues);
+  }
 
 
   return (
@@ -59,176 +118,206 @@ function NewDeliveryScreen(props) {
         <MapView
           style={styles.map}
           provider='google'
-          initialRegion={{
-            latitude: -34.604593,
-            longitude: -58.428880,
-            latitudeDelta: 0.1822,
-            longitudeDelta: 0.0421,
+          region={{
+            latitude: region.latitude,
+            longitude: region.longitude,
+            latitudeDelta: region.latitudeDelta,
+            longitudeDelta: region.longitudeDelta,
           }}
           >
-          <Marker coordinate={{ latitude: marker.latitude, longitude: marker.longitude}}/>
+          {inputValues.latitude != 0 &&
+            <Marker coordinate={{ latitude: inputValues.latitude, longitude: inputValues.longitude}}/>
+          }
         </MapView>
       </View>
-      {/*<View style={styles.searchContainer}>
-        <GooglePlacesAutocomplete
-          placeholder='Buscar'
-          onPress={onPress}
-          query={{
-            key: GOOGLE_API_KEY,
-            language: 'es',
-          }}
-          GooglePlacesDetailsQuery={{
-            fields: 'address_component,geometry',
-          }}
-          fetchDetails={true}
-          sytles={{
-            textInput: styles.input
-          }}
-        />
-      </View>*/}
-      <ScrollView style={{width: '100%'}}>
+      <ScrollView style={{width: '100%'}} keyboardShouldPersistTaps='always' listViewDisplayed={false} >
         <View style={styles.titleContainer}>
-          <Text style={styles.sectionTitle}>Cliente del pedido nro. {marker.deliveryid}</Text>
+          <Text style={styles.sectionTitle}>Datos del Cliente</Text>
         </View>
         <View style={styles.inputRow}>
           <Input
             label='Nombre'
             placeholder='Nombre'
-            textInputConfig={{
-              editable: false,
-              value: marker.customerName
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'name'),
+              value: inputValues.name
+            }}
           />
           <Input
             label='Apellido'
             placeholder='Apellido'
-            textInputConfig={{
-              editable: false,
-              value: marker.customerSurname
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'surname'),
+              value: inputValues.surname
+            }}
           />
         </View>
         <View style={styles.inputRow}>
           <Input
-            label='Dirección'
-            placeholder='Dirección'
-            textInputConfig={{
-              editable: false,
-              value: marker.customerAddress
-            }}
+            label='DNI'
+            placeholder='DNI'
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'dni'),
+              value: inputValues.dni
+            }}
           />
+          <Input
+            label='Teléfono'
+            placeholder='Teléfono'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'telephone'),
+              value: inputValues.telephone
+            }}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Dirección</Text>
+            <GooglePlacesAutocomplete
+              placeholder='Buscar dirección'
+              onPress={onPress}
+              query={{
+                key: GOOGLE_API_KEY,
+                language: 'es',
+              }}
+              GooglePlacesDetailsQuery={{
+                fields: 'address_component,geometry',
+              }}
+              fetchDetails={true}
+              styles={{
+                textInput: styles.googleSearchInput
+              }}
+            />
+          </View>
         </View>
         <View style={styles.inputRow}>
           <Input
             label='Partido/Comuna'
             placeholder='Partido/Comuna'
-            textInputConfig={{
-              editable: false,
-              value: marker.customerDistrict
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'neighborhood'),
+              value: inputValues.neighborhood
+            }}
           />
         </View>
         <View style={styles.inputRow}>
           <Input
             label='Provincia'
             placeholder='Provincia'
-            textInputConfig={{
-              editable: false,
-              value: marker.customerProvince
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'province'),
+              value: inputValues.province
+            }}
           />
         </View>
         <View style={styles.titleContainer}>
-          <Text style={styles.sectionTitle}>Producto</Text>
+          <Text style={styles.sectionTitle}>Datos del Producto</Text>
         </View>
-        <View style={styles.titleContainer}>
-          <Text style={styles.sectionTitle}>Estado: {marker.status}</Text>
-        </View>
-        <View style={styles.inputRow}>
+
+        <View style={styles.halfInputRow}>
           <Input
             label='Código de barras'
-            placeholder='Código de barras'
-            textInputConfig={{
-              editable: false,
-              value: marker.productId.toString()
-            }}
+            placeholder='Ingrese el código de barras...'
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'barcode'),
+              value: inputValues.barcode
+            }}
           />
+          <Pressable
+            onPress={() => {
+              barcodePressHandler();
+            }}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <Icon
+              name='barcode-scan'
+              type='material-community'
+              style={styles.barcodeScanIcon}
+              size={30}
+              color='grey'
+            />
+          </Pressable>
         </View>
         <View style={styles.inputRow}>
           <Input
             label='Descripción'
             placeholder='Descripción'
-            textInputConfig={{
-              editable: false,
-              value: marker.productName
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'description'),
+              value: inputValues.description
+            }}
           />
         </View>
-        <View style={styles.inputRow}>
+        {/*<View style={styles.inputRow}>
           <Input
-            label='Categoría'
+            label='Categoría  - Opcional'
             placeholder='Categoría'
-            textInputConfig={{
-              editable: false,
-              value: marker.productCategory
-            }}
             style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'category'),
+              value: inputValues.category
+            }}
           />
-        </View>
+          </View>*/}
         <View>
           <View style={styles.halfInputRow}>
             <Input
-              label='Alto (cm)'
+              label='Alto (cm)  - Opcional'
               placeholder='Alto'
-              textInputConfig={{
-                editable: false,
-                value: marker.productHeight
-              }}
               style={styles.allInputRow}
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, 'height'),
+                value: inputValues.height
+              }}
             />
             <Input
-              label='Ancho (cm)'
+              label='Ancho (cm)  - Opcional'
               placeholder='Ancho'
-              textInputConfig={{
-                editable: false,
-                value: marker.productWidth
-              }}
               style={styles.allInputRow}
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, 'width'),
+                value: inputValues.width
+              }}
             />
           </View>
           <View style={styles.halfInputRow}>
             <Input
-              label='Largo (cm)'
+              label='Largo (cm)  - Opcional'
               placeholder='Largo'
-              textInputConfig={{
-                editable: false,
-                value: marker.productHeight
-              }}
               style={styles.allInputRow}
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, 'height'),
+                value: inputValues.height
+              }}
             />
             <Input
-              label='Peso (kg)'
+              label='Peso (kg)  - Opcional'
               placeholder='Peso'
-              textInputConfig={{
-                editable: false,
-                value: marker.productWeight
-              }}
               style={styles.allInputRow}
+              textInputConfig={{
+                onChangeText: inputChangedHandler.bind(this, 'weight'),
+                value: inputValues.weight
+              }}
             />
           </View>
           <View style={styles.halfInputRow}>
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
-                title="Frágil"
-                checked={marker.productFragility}
+                title="Frágil -       Opcional"
+                checked={inputValues.fragility}
+                onPress={() => setInputValues((curInputValues) => ({
+                    ...curInputValues,
+                    fragility: !inputValues.fragility
+                }))}
               />
               <Tooltip
                 visible={fragileTooltipOpen}
@@ -257,8 +346,12 @@ function NewDeliveryScreen(props) {
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
-                title="Apilable"
-                checked={marker.productStackability}
+                title="Apilable  - Opcional"
+                checked={inputValues.stackability}
+                onPress={() => setInputValues((curInputValues) => ({
+                    ...curInputValues,
+                    stackability: !inputValues.stackability
+                }))}
               />
               <Tooltip
                 visible={stackabilityTooltipOpen}
@@ -286,6 +379,9 @@ function NewDeliveryScreen(props) {
             </View>
           </View>
         </View>
+        <Button style={styles.button} onPress={submitHandler}>
+          Agregar
+        </Button>
       </ScrollView>
     </View>
   );
@@ -296,22 +392,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  searchContainer: {
-    width: '90%',
-    position: 'absolute',
-    backgroundColor: 'white',
-    shadowColor: 'black',
-    shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 4,
-    padding: 4,
-    borderRadius: 8,
-    marginTop: 12
+  inputContainer: {
+    marginHorizontal: 4,
+    marginVertical: 0,
+    flex: 1
+  },
+  label: {
+    fontSize: 16,
+    color: 'grey',
+    marginBottom: 4,
+    fontWeight: 'bold'
   },
   input: {
     borderColor: 'grey',
     borderWidth: 1,
+  },
+  googleSearchInput: {
+    backgroundColor: 'white',
+    padding: 6,
+    borderRadius: 6,
+    fontSize: 18,
+    color: 'black'
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -358,6 +459,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10
+  },
+  button: {
+    minWidth: 120,
+    marginHorizontal: 8,
+    bottom: 40,
+    paddingTop:60,
+    paddingHorizontal: 20
+  },
+  barcodeScanIcon: {
+    marginTop: 25,
+    marginLeft: 10,
   },
 })
 

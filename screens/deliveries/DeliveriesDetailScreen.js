@@ -8,9 +8,7 @@ import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
 import Input from '../../components/Input';
 import Button from '../../components/Button'
 
-function DeliveriesDetailScreen(props) {
-
-  console.log(props.route.params.itemData);
+function DeliveriesDetailScreen(props, { navigation }) {
   const [marker, setMarker] = useState({ 
     latitude: props.route.params.itemData.customerLatitude, 
     longitude: props.route.params.itemData.customerLongitude,
@@ -19,6 +17,8 @@ function DeliveriesDetailScreen(props) {
     customerProvince: props.route.params.itemData.customerProvince,
     customerName: props.route.params.itemData.customerName,
     customerSurname: props.route.params.itemData.customerSurname,
+    dni: props.route.params.itemData.customerDni,
+    telephone: props.route.params.itemData.customerTelephone,
     productId: props.route.params.itemData.productId,
     productName: props.route.params.itemData.productName,
     productCategory: props.route.params.itemData.productCategory,
@@ -49,10 +49,6 @@ function DeliveriesDetailScreen(props) {
       customerSurname: props.route.params.itemData.customerSurname
     };
     setMarker(customerDetails);
-    console.log(data, details);
-    console.log(locationDetails);
-    //setRegion(details.geometry.location);
-    //setMarker(details.geometry.location);
   };
 
 
@@ -72,23 +68,6 @@ function DeliveriesDetailScreen(props) {
           <Marker coordinate={{ latitude: marker.latitude, longitude: marker.longitude}}/>
         </MapView>
       </View>
-      {/*<View style={styles.searchContainer}>
-        <GooglePlacesAutocomplete
-          placeholder='Buscar'
-          onPress={onPress}
-          query={{
-            key: GOOGLE_API_KEY,
-            language: 'es',
-          }}
-          GooglePlacesDetailsQuery={{
-            fields: 'address_component,geometry',
-          }}
-          fetchDetails={true}
-          sytles={{
-            textInput: styles.input
-          }}
-        />
-      </View>*/}
       <ScrollView style={{width: '100%'}}>
         <View style={styles.titleContainer}>
           <Text style={styles.sectionTitle}>Cliente del pedido nro. {marker.deliveryid}</Text>
@@ -109,6 +88,26 @@ function DeliveriesDetailScreen(props) {
             textInputConfig={{
               editable: false,
               value: marker.customerSurname
+            }}
+            style={styles.allInputRow}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='DNI'
+            placeholder='DNI'
+            textInputConfig={{
+              editable: false,
+              value: marker.dni
+            }}
+            style={styles.allInputRow}
+          />
+          <Input
+            label='Teléfono'
+            placeholder='Teléfono'
+            textInputConfig={{
+              editable: false,
+              value: marker.telephone
             }}
             style={styles.allInputRow}
           />
@@ -174,7 +173,7 @@ function DeliveriesDetailScreen(props) {
             style={styles.allInputRow}
           />
         </View>
-        <View style={styles.inputRow}>
+        {/*<View style={styles.inputRow}>
           <Input
             label='Categoría'
             placeholder='Categoría'
@@ -184,7 +183,7 @@ function DeliveriesDetailScreen(props) {
             }}
             style={styles.allInputRow}
           />
-        </View>
+        </View*/}
         <View>
           <View style={styles.halfInputRow}>
             <Input

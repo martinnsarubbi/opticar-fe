@@ -12,7 +12,7 @@ function HomeHeader() {
         />
       </View>
       <View style={styles.addessContainer}>
-        <Text style={styles.textStyle}>Niceto Vega 2121, Palermo, CABA, Argentina</Text>
+        <Text style={styles.textStyle}>Los Andes 442, Esteban Echeverría, Buenos Aires, Argentina</Text>
       </View>
       <View style={styles.gearContainer}>
         <Icon

@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   locationText: {
-    textAlign: 'right',
+    textAlign: 'left',
     color: 'grey'
   },
   volumeText: {

@@ -15,7 +15,6 @@ function SizingItemsScreen({ navigation, route }) {
   const [seeAllDeliveries, setSeeAllDeliveries] = useState();
   const [withoutSizingDeliveries, setWithoutSizingDeliveries] = useState();
   const [deliveries, setDeliveries] = useState();
-  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const [inputValues, setInputValues] = useState({ barcode: '', originScreen: 'SizingItemsScreen'});
 
@@ -34,13 +33,12 @@ function SizingItemsScreen({ navigation, route }) {
       } catch(error) {
         setError('No se pudieron obtener las entregas.')
       }
-      setIsFetching(false);
     }
     getDeliveries();
   }, []);
 
   useEffect(() => {
-    console.log(1)
+
     async function getSearchFilterData() {
       const searchFilteredData = searchText
         ? deliveries.filter((x) =>
@@ -54,11 +52,9 @@ function SizingItemsScreen({ navigation, route }) {
   }, [searchText]);
 
   useEffect(() => {
-    console.log(2)
-    console.log(route?.params?.navigationParams)
     async function getBarcodeOnSearchField() {
       setSearchText(route?.params?.navigationParams)
-      console.log('seteado')
+
     }
     getBarcodeOnSearchField();
   }, [route?.params?.navigationParams]);
