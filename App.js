@@ -14,6 +14,7 @@ import BarcodeScreen from './screens/sizing/BarcodeScreen';
 import NewDeliveryScreen from './screens/deliveries/NewDeliveryScreen';
 import TruckLoadScreen from './screens/truck-loading/TruckLoadScreen';
 import SizingItemsScreen from './screens/sizing/SizingItemsScreen';
+import ARScreen from './screens/sizing/ar/ARScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -49,6 +50,7 @@ export default function App() {
           <Stack.Screen name='Planificación' component={PlanningScreen} />
           <Stack.Screen name='Carga' component={TruckLoadScreen} />
           <Stack.Screen name='Dimensionamiento de productos' component={SizingItemsScreen} />
+          <Stack.Screen name='Medición' component={ARScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

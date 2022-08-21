@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_API_KEY } from '../../environment';
@@ -119,7 +119,7 @@ function NewDeliveryScreen({ navigation }) {
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}
-          provider='google'
+          provider={PROVIDER_GOOGLE}
           region={{
             latitude: region.latitude,
             longitude: region.longitude,

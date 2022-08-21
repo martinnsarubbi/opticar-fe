@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
 import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
 import Input from '../../components/Input';
@@ -52,7 +52,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}
-          provider='google'
+          provider={PROVIDER_GOOGLE}
           initialRegion={{
             latitude: marker.latitude,
             longitude: marker.longitude,

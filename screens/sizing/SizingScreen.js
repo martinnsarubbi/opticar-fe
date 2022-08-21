@@ -41,6 +41,10 @@ function SizingScreen({ navigation, route }) {
     navigation.navigate('Código de barras', { inputValues } );
   }
 
+  function arPressHandler() {
+    navigation.navigate('Medición', { inputValues } );
+  }
+
   async function submitHandler() {
     const productData = {
       barcode: inputValues.barcode,
@@ -145,13 +149,20 @@ function SizingScreen({ navigation, route }) {
               returnKeyType:'done'
             }}
           />
-          <Icon
-              name='augmented-reality'
-              type='material-community'
-              style={styles.arIcon}
-              size={30}
-              color='grey'
-          />
+          <Pressable
+            onPress={() => {
+              arPressHandler();
+            }}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <Icon
+                name='augmented-reality'
+                type='material-community'
+                style={styles.arIcon}
+                size={30}
+                color='grey'
+            />
+          </Pressable>
           <Input
             label='Ancho (cm)'
             placeholder='Ej.: 20,33 cm'
@@ -162,13 +173,20 @@ function SizingScreen({ navigation, route }) {
               returnKeyType:'done'
             }}
           />
-          <Icon
-              name='augmented-reality'
-              type='material-community'
-              style={styles.arIcon}
-              size={30}
-              color='grey'
-          />
+          <Pressable
+            onPress={() => {
+              arPressHandler();
+            }}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <Icon
+                name='augmented-reality'
+                type='material-community'
+                style={styles.arIcon}
+                size={30}
+                color='grey'
+            />
+          </Pressable>
         </View>
         <View style={styles.halfInputRow}>
           <Input
@@ -181,13 +199,20 @@ function SizingScreen({ navigation, route }) {
               returnKeyType:'done'
             }}
           />
-          <Icon
-              name='augmented-reality'
-              type='material-community'
-              style={styles.arIcon}
-              size={30}
-              color='grey'
-          />
+          <Pressable
+            onPress={() => {
+              arPressHandler();
+            }}
+            style={({ pressed }) => pressed && styles.pressed}
+          >
+            <Icon
+                name='augmented-reality'
+                type='material-community'
+                style={styles.arIcon}
+                size={30}
+                color='grey'
+            />
+          </Pressable>
           <Input
             label='Peso (kg)'
             placeholder='Ej.: 15,51 kg'
