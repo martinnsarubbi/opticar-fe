@@ -314,6 +314,7 @@ function NewDeliveryScreen({ navigation }) {
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
+                accessibilityRole='button'
                 title="Frágil -       Opcional"
                 checked={inputValues.fragility}
                 onPress={() => setInputValues((curInputValues) => ({
@@ -348,6 +349,7 @@ function NewDeliveryScreen({ navigation }) {
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
+                accessibilityRole='button'
                 title="Apilable  - Opcional"
                 checked={inputValues.stackability}
                 onPress={() => setInputValues((curInputValues) => ({

@@ -177,7 +177,7 @@ const MeasureSceneAR = () => {
           lightReceivingBitMask={3}
           shadowCastingBitMask={2}
           transformBehaviors={['billboardY']}
-          //resources={[require('./res/sphere/sphere.mtl')]}
+          resources={[require('./res/sphere/sphere.mtl')]}
         />
       </ViroNode>
 
@@ -200,14 +200,14 @@ const MeasureSceneAR = () => {
           shadowOpacity={.7} />
 
         <Viro3DObject
-          source={require('../../../res/sphere/sphere.obj')}
+          //source={require('../../../res/sphere/sphere.obj')}
           position={[0, 0, 0]}
           scale={[.00025, .00025, .00025]}
           type="OBJ"
           lightReceivingBitMask={3}
           shadowCastingBitMask={2}
           transformBehaviors={['billboardY']}
-          resources={[require('../../../res/sphere/sphere.mtl')]}
+          //resources={[require('../../../res/sphere/sphere.mtl')]}
         />
 
           <ViroText 

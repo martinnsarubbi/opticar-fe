@@ -5,9 +5,9 @@
  * @format
  */
 
- const { getDefaultConfig } = require("metro-config");
+ import { getDefaultConfig } from "metro-config";
 
- module.exports = (async () => {
+ export default (async () => {
    const {
      resolver: { assetExts }
    } = await getDefaultConfig();

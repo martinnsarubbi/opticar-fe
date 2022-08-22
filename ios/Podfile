@@ -26,6 +26,8 @@ target 'opticarfe' do
     # An absolute path to your application root.
     :app_path => "#{Dir.pwd}/.."
   )
+  pod 'ViroReact', :path => '../node_modules/@viro-community/react-viro/ios/'
+  pod 'ViroKit', :path => '../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/'
 
   # Uncomment to opt-in to using Flipper
   # Note that if you have use_frameworks! enabled, Flipper will not work

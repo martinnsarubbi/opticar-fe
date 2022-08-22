@@ -230,6 +230,7 @@ function SizingScreen({ navigation, route }) {
           <View style={styles.checkBoxContainer}>
             <CheckBox
               center
+              accessibilityRole='button'
               title="Frágil"
               checked={fragility}
               onPress={() => setFragility(!fragility)}
@@ -261,6 +262,7 @@ function SizingScreen({ navigation, route }) {
           <View style={styles.checkBoxContainer}>
             <CheckBox
               center
+              accessibilityRole='button'
               title="Apilable"
               checked={stackability}
               onPress={() => setStackability(!stackability)}
