@@ -224,6 +224,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
+                accessibilityRole='button'
                 title="Frágil"
                 checked={marker.productFragility}
               />
@@ -254,6 +255,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
             <View style={styles.checkBoxContainer}>
               <CheckBox
                 center
+                accessibilityRole='button'
                 title="Apilable"
                 checked={marker.productStackability}
               />

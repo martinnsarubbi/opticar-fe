@@ -301,6 +301,11 @@ function ARScreen({ navigation, route }) {
     async function arComplete() {
       console.log("Llegue");
       console.log("height:" + height.toString());
+      route.params.inputValues.height = height.toString();
+      route.params.inputValues.length = length.toString();
+      route.params.inputValues.width = width.toString();
+      const navigationParams = route.params.inputValues;
+
       if (height > 0 && width > 0 && length > 0) {
         Alert.alert(
           "Ha realizado todas las mediciones! ",
@@ -309,7 +314,7 @@ function ARScreen({ navigation, route }) {
             {
               text: "Si",
               onPress: () => {
-                navigation.navigate('Dimensionamiento de nuevo producto')
+                navigation.navigate('Dimensionamiento de nuevo producto', { navigationParams })
               }
             },
             {
