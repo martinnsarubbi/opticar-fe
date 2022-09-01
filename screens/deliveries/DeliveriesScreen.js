@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, FlatList, Text, Image, Pressable } from 'react-native';
 import AddButton from '../../components/AddButton';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -13,46 +13,56 @@ function DeliveriesScreen({ navigation }) {
   const [markers, setMarkers] = useState([ { coordinates: { latitude: 37.78383, longitude: -122.405766 } } ]);
   const [searchText, setSearchText] = useState();
   const [flatItems, setFlatItems] = useState();
+  const [loaded, setLoaded] = useState(false);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    const unsuscribe = navigation.addListener("focus", () => {
+      getDeliveries();
+    });
+    return unsuscribe;
+  }, [navigation])
   
   function deliveriesPressHandler(itemData) {
     navigation.navigate('Detalle de entrega', { itemData })
   }
 
   useEffect(() => {
-    async function getDeliveries() {
-      setIsFetching(true);
-      try {
-        const deliveries = await fetchDeliveries(true, true);
-
-        const markers = [];
-        for(const key in deliveries) {
-          const coordinatesObj = {
-            coordinates: {
-              longitude: deliveries[key].customerLongitude,
-              latitude: deliveries[key].customerLatitude,
-            },
-            name: deliveries[key].productName
-          }
-          markers.push(coordinatesObj);
-        }
-
-        const searchFilteredData = searchText
-          ? deliveries.filter((x) =>
-                  x.searchField.toLowerCase().includes(searchText.toLowerCase())
-            )
-          : deliveries;
-
-        setDeliveries(deliveries);
-        setFlatItems(searchFilteredData)
-        setMarkers(markers);
-
-      } catch(error) {
-        setError('No se pudieron obtener las entregas.')
-      }
-      setIsFetching(false);
-    }
     getDeliveries();
   }, []);
+
+  async function getDeliveries() {
+    setIsFetching(true);
+    try {
+      const deliveries = await fetchDeliveries(true, true);
+
+      const markers = [];
+      for(const key in deliveries) {
+        const coordinatesObj = {
+          coordinates: {
+            longitude: deliveries[key].customerLongitude,
+            latitude: deliveries[key].customerLatitude,
+          },
+          name: deliveries[key].productName
+        }
+        markers.push(coordinatesObj);
+      }
+
+      const searchFilteredData = searchText
+        ? deliveries.filter((x) =>
+                x.searchField.toLowerCase().includes(searchText.toLowerCase())
+          )
+        : deliveries;
+
+      setDeliveries(deliveries);
+      setFlatItems(searchFilteredData)
+      setMarkers(markers);
+
+    } catch(error) {
+      setError('No se pudieron obtener las entregas.')
+    }
+    setIsFetching(false);
+  }
 
   useEffect(() => {
     async function getSearchFilterData() {
@@ -112,6 +122,15 @@ function DeliveriesScreen({ navigation }) {
               longitude: -58.428880,
               latitudeDelta: 0.1822,
               longitudeDelta: 0.0421,
+            }}
+            ref={mapRef}
+            onRegionChangeComplete={(region) => { 
+              if (!loaded) { 
+                if (region.latitude != -34.604593 || region.longitude != -58.428880) {
+                  mapRef.current.animateToRegion({latitude: -34.604593, longitude: -58.428880, latitudeDelta: 0.1822, longitudeDelta: 0.0421, }, 1)
+                }
+                setLoaded(true)
+              } 
             }}
           >
             {markers.map((item, index) => (

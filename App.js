@@ -41,7 +41,7 @@ export default function App() {
               headerTitle: (props) => <HomeHeader/>
             }}
           />
-          <Stack.Screen name='Entregas' component={DeliveriesScreen} />
+          <Stack.Screen name='Entregas' component={DeliveriesScreen} options={{ unmountOnBlur: true }} />
           <Stack.Screen name='Detalle de entrega' component={DeliveriesDetailScreen} />
           <Stack.Screen name='Nueva entrega' component={NewDeliveryScreen} />
           <Stack.Screen name='Dimensionamiento de nuevo producto' component={SizingScreen} />
@@ -49,7 +49,7 @@ export default function App() {
           <Stack.Screen name='Transporte' component={TruckScreen} />
           <Stack.Screen name='Planificación' component={PlanningScreen} />
           <Stack.Screen name='Carga' component={TruckLoadScreen} />
-          <Stack.Screen name='Dimensionamiento de productos' component={SizingItemsScreen} />
+          <Stack.Screen name='Dimensionamiento de productos' component={SizingItemsScreen} options={{ unmountOnBlur: true }} />
           <Stack.Screen name='Medición' component={ARScreen} />
         </Stack.Navigator>
       </NavigationContainer>

@@ -12,7 +12,7 @@ function ModulesScreen({ navigation }) {
           style={styles.moduleContainer}
         >
           <Pressable onPress={() => navigation.navigate('Entregas')}>
-            <Text style={styles.moduleTitle}>Gestionar entregas</Text>
+            <Text style={styles.moduleTitle}>Entregas</Text>
           </Pressable>
         </LinearGradient>
         <LinearGradient
@@ -21,7 +21,7 @@ function ModulesScreen({ navigation }) {
           style={styles.moduleContainer}
         >
           <Pressable onPress={() => navigation.navigate('Dimensionamiento de productos')}>
-            <Text style={styles.moduleTitle}>Dimensionar Pedidos</Text>
+            <Text style={styles.moduleTitle}>Dimensionar productos</Text>
           </Pressable>
         </LinearGradient>
         <LinearGradient
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   moduleTitle: {
     color: 'white',
-    fontSize: 30,
+    fontSize: 29,
     textAlign: 'center',
     fontWeight: 'bold'
   },

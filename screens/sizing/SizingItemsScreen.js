@@ -19,23 +19,31 @@ function SizingItemsScreen({ navigation, route }) {
   const [inputValues, setInputValues] = useState({ barcode: '', originScreen: 'SizingItemsScreen'});
 
   useEffect(() => {
-    async function getDeliveries() {
-      try {
-        let deliveries = await fetchDeliveries(true, true);
-        const productIds = deliveries.map(o => o.productId)
-        deliveries = deliveries.filter(({productId}, index) => !productIds.includes(productId, index + 1))
-
-        setSeeAllDeliveries(deliveries);
-        setWithoutSizingDeliveries(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
-        setDeliveries(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
-        setFlatItems(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
-
-      } catch(error) {
-        setError('No se pudieron obtener las entregas.')
-      }
-    }
     getDeliveries();
   }, []);
+
+  async function getDeliveries() {
+    try {
+      let deliveries = await fetchDeliveries(true, true);
+      const productIds = deliveries.map(o => o.productId)
+      deliveries = deliveries.filter(({productId}, index) => !productIds.includes(productId, index + 1))
+
+      setSeeAllDeliveries(deliveries);
+      setWithoutSizingDeliveries(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
+      setDeliveries(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
+      setFlatItems(deliveries.filter((obj) => obj.status === 'Pendiente de dimensionar'))
+
+    } catch(error) {
+      setError('No se pudieron obtener las entregas.')
+    }
+  }
+
+  useEffect(() => {
+    const unsuscribe = navigation.addListener("focus", () => {
+      getDeliveries();
+    });
+    return unsuscribe;
+  }, [navigation])
 
   useEffect(() => {
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
@@ -9,17 +9,23 @@ import Input from '../../components/Input';
 import Button from '../../components/Button'
 import { LogBox } from 'react-native';
 import { storeDelivery, fetchDeliveries } from '../../util/http';
+import DatePicker from 'react-native-date-picker';
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.']);
 
 function NewDeliveryScreen({ navigation }) {
 
-  const [region, setRegion] = useState({
+  const [currRegion, setCurrRegion] = useState({
     latitude: -34.604593,
     longitude: -58.428880,
     latitudeDelta: 0.1822,
     longitudeDelta: 0.0421,
   })
+  const mapRef = useRef(null);
+  const [loaded, setLoaded] = useState(false)
+  const [date, setDate] = useState(new Date())
+  const [open, setOpen] = useState(false)
+
   const [inputValues, setInputValues] = useState({ 
     latitude: 0, 
     longitude: 0,
@@ -31,6 +37,7 @@ function NewDeliveryScreen({ navigation }) {
     surname: '',
     dni: '',
     telephone: '',
+    deliveryDate: '',
     barcode: '',
     description: '',
     category: '',
@@ -79,7 +86,7 @@ function NewDeliveryScreen({ navigation }) {
   const onPress = (data, details) => {    
     const locationDetails = getLocationDetailsFromGoogleMapsJSON(details);
 
-    setRegion({
+    setCurrRegion({
       latitude: details.geometry.location.lat,
       longitude: details.geometry.location.lng,
       latitudeDelta: 0.0059,
@@ -105,12 +112,17 @@ function NewDeliveryScreen({ navigation }) {
     });
   }
 
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
+
   function barcodePressHandler() {
     navigation.navigate('Código de barras', { inputValues } );
   }
 
   async function submitHandler() {
     const id = await storeDelivery(inputValues);
+    navigation.navigate('Entregas');
   }
 
 
@@ -120,13 +132,22 @@ function NewDeliveryScreen({ navigation }) {
         <MapView
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          region={{
-            latitude: region.latitude,
-            longitude: region.longitude,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta,
+          initialRegion={{
+            latitude: currRegion.latitude,
+            longitude: currRegion.longitude,
+            latitudeDelta: currRegion.latitudeDelta,
+            longitudeDelta: currRegion.longitudeDelta,
           }}
-          >
+          ref={mapRef}
+          onRegionChangeComplete={(region) => { 
+            if (!loaded) { 
+              if (region.latitude != currRegion.latitude || region.longitude != currRegion.longitude) {
+                mapRef.current.animateToRegion(currRegion, 1)
+              }
+              setLoaded(true)
+            } 
+          }}
+        >
           {inputValues.latitude != 0 &&
             <Marker coordinate={{ latitude: inputValues.latitude, longitude: inputValues.longitude}}/>
           }
@@ -218,6 +239,47 @@ function NewDeliveryScreen({ navigation }) {
             }}
           />
         </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='Fecha de entrega'
+            placeholder='dd/mm/yyyy'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, inputValues.deliveryDate),
+              value: inputValues.deliveryDate
+            }}
+          />
+          <Icon
+              name='calendar'
+              type='material-community'
+              style={styles.barcodeScanIcon}
+              size={30}
+              color='grey'
+              onPress={() => setOpen(true)}
+            />
+          <DatePicker
+            modal
+            open={open}
+            mode="date"
+            date={date}
+            onConfirm={(date) => {
+              setOpen(false)
+              setDate(date)
+              console.log(date)
+              setInputValues((curInputValues) => ({
+                ...curInputValues,
+                deliveryDate: [
+                    padTo2Digits(date.getDate()),
+                    padTo2Digits(date.getMonth() + 1),
+                    date.getFullYear(),
+                  ].join('/')
+            }))}}
+            onCancel={() => {
+              setOpen(false)
+            }}
+          />
+        </View>
+        
         <View style={styles.titleContainer}>
           <Text style={styles.sectionTitle}>Datos del Producto</Text>
         </View>

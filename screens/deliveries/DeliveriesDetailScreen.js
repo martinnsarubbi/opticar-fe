@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
@@ -27,9 +27,14 @@ function DeliveriesDetailScreen(props, { navigation }) {
     productFragility: (props.route.params.itemData.productFragility === 'Si') ? true : false,
     deliveryid: props.route.params.itemData.deliveryid,
     status: props.route.params.itemData.status,
+    latitudeDelta: 0.0059,
+    longitudeDelta: 0.0059,
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
-  const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
+  const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false);
+
+  const mapRef = useRef(null);
+  const [loaded, setLoaded] = useState(false)
 
   const onPress = (data, details) => {
     const locationDetails = getLocationDetailsFromGoogleMapsJSON(details);
@@ -56,10 +61,19 @@ function DeliveriesDetailScreen(props, { navigation }) {
           initialRegion={{
             latitude: marker.latitude,
             longitude: marker.longitude,
-            latitudeDelta: 0.0059,
-            longitudeDelta: 0.0059,
+            latitudeDelta: 0.1822,
+            longitudeDelta: 0.0421
           }}
-          >
+          ref={mapRef}
+          onRegionChangeComplete={(region) => { 
+            if (!loaded) { 
+              if (region.latitude != marker.latitude || region.longitude != marker.longitude) {
+                mapRef.current.animateToRegion(marker, 1)
+              }
+              setLoaded(true)
+            } 
+          }}
+        >
           <Marker coordinate={{ latitude: marker.latitude, longitude: marker.longitude}}/>
         </MapView>
       </View>

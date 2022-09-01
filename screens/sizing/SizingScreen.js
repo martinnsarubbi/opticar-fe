@@ -13,7 +13,7 @@ function SizingScreen({ navigation, route }) {
     height: (route.params?.itemData?.productHeight > 0) ? route.params?.itemData?.productHeight.toString() : '',
     length: (route.params?.itemData?.productLength > 0) ? route.params?.itemData?.productLength.toString() : '',
     weight: (route.params?.itemData?.productWeight > 0) ? route.params?.itemData?.productWeight.toString() : '',
-    width: (route.params?.itemData?.productWidth > 0) ? route.params?.itemData?.productWidth.toString() : ''
+    width: (route.params?.itemData?.productWidth > 0) ? route.params?.itemData?.productWidth.toString() : '',
   });
 
   const [fragility, setFragility] = useState((route.params?.itemData?.productFragility) ? route.params?.itemData?.productFragility : false);
@@ -53,9 +53,11 @@ function SizingScreen({ navigation, route }) {
       length: +inputValues.length,
       weight: +inputValues.weight,
       width: +inputValues.width,
-      entryDate: new Date()
+      entryDate: new Date(),
+      id: inputValues.barcode
     };
     const id = await storeProduct(productData);
+    navigation.navigate('Dimensionamiento de productos')
   }
 
   return (
