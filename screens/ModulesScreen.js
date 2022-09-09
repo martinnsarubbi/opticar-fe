@@ -38,7 +38,9 @@ function ModulesScreen({ navigation }) {
           colors={['#00254d', '#0055b3']}
           style={styles.moduleContainer}
         >
-          <Text style={styles.moduleTitle}>Carga al camión</Text>
+          <Pressable onPress={() => navigation.navigate('Carga')}>
+            <Text style={styles.moduleTitle}>Carga al camión</Text>
+          </Pressable>
         </LinearGradient>
         <LinearGradient
           // Background Linear Gradient
