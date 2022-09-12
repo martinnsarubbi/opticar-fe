@@ -15,6 +15,7 @@ import NewDeliveryScreen from './screens/deliveries/NewDeliveryScreen';
 import TruckLoadScreen from './screens/truck-loading/TruckLoadScreen';
 import SizingItemsScreen from './screens/sizing/SizingItemsScreen';
 import ARScreen from './screens/sizing/ar/ARScreen';
+import DeliveriesSelectionScreen from './screens/planning/DeliveriesSelectionScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -46,11 +47,12 @@ export default function App() {
           <Stack.Screen name='Nueva entrega' component={NewDeliveryScreen} />
           <Stack.Screen name='Dimensionamiento de nuevo producto' component={SizingScreen} />
           <Stack.Screen name='Código de barras' component={BarcodeScreen} />
-          <Stack.Screen name='Transporte' component={TruckScreen} />
+          <Stack.Screen name='Selección de transporte' component={TruckScreen} />
           <Stack.Screen name='Planificación' component={PlanningScreen} />
           <Stack.Screen name='Carga' component={TruckLoadScreen} />
           <Stack.Screen name='Dimensionamiento de productos' component={SizingItemsScreen} options={{ unmountOnBlur: true }} />
           <Stack.Screen name='Medición' component={ARScreen} />
+          <Stack.Screen name='Selección de entregas' component={DeliveriesSelectionScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

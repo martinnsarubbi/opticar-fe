@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Icon, Tooltip } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker';
+import { fetchDeliveries, fetchTrucks, planningAlgorithm } from '../../util/http';
+import Button from '../../components/Button';
 
-function PlanningScreen() {
+function PlanningScreen({ navigation, route }) {
 
   const [date, setDate] = useState(new Date());
   const [markers, setMarkers] = useState([ { coordinates: { latitude: 37.78383, longitude: -122.405766 } } ]);
@@ -12,15 +14,118 @@ function PlanningScreen() {
   const [openDatePicker, setOpenDatePicker] = useState(false)
   const [deliveryTooltipOpen, setDeliveryTooltipOpen] = useState(false)
   const [truckTooltipOpen, setTruckTooltipOpen] = useState(false)
-  const mapRef = useRef(null);
+  const [deliveries, setDeliveries] = useState();
+  const [trucks, setTrucks] = useState();
+  const [deliveryCount, setDeliveryCount] = useState(0);
+  const [truckCount, setTrucksCount] = useState(0);
+  const [deliveriesFetched, setDeliveriesFetched] = useState(false);
+  const [trucksFetched, setTrucksFetched] = useState(false);
   const [inputValues, setInputValues] = useState({ 
     deliveryDate: ''
   });
+  const mapRef = useRef(null);
 
   function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
   }
 
+  useEffect(() => {
+    if (route.params?.deliveries) {
+      getDeliveries(route.params.deliveries)
+    }
+  }, [route.params?.deliveries]);
+
+  useEffect(() => {
+    if (route.params?.trucks) {
+      getTrucks(route.params.trucks)
+    }
+  }, [route.params?.trucks]);
+
+  useEffect(() => {
+      if(!deliveriesFetched) {
+        getDeliveries(null);
+      }
+      if(!trucksFetched) {
+        getTrucks(null);
+      }
+    }, [])
+
+  async function getDeliveries(input) {
+    try {
+      let deliveriesList = null;
+      if(!deliveriesFetched) {
+        deliveriesList = await fetchDeliveries(true, false);
+        setDeliveriesFetched(true)
+      } else {
+        deliveriesList = input;
+      }
+      const markers = [];
+      let deliveryCounter = 0;
+      for(const key in deliveriesList) {
+        if(deliveriesList[key].checkedForPlanning == true) {
+          deliveryCounter += 1;
+          const coordinatesObj = {
+            coordinates: {
+              longitude: deliveriesList[key].customerLongitude,
+              latitude: deliveriesList[key].customerLatitude,
+            },
+            name: deliveriesList[key].productName
+          }
+          markers.push(coordinatesObj);
+        }
+      }
+
+      setDeliveryCount(deliveryCounter)
+      setDeliveries(deliveriesList);
+      setMarkers(markers);
+    } catch(error) {
+      console.log('Error: ' + error)
+    }
+  }
+
+  async function getTrucks(input) {
+    try {
+      let trucksList = null;
+      if(!trucksFetched) {
+        trucksList = await fetchTrucks();
+        setTrucksFetched(true)
+      } else {
+        trucksList = input;
+      }
+      const markers = [];
+      let truckCounter = 0;
+      for(const key in trucksList) {
+        if(trucksList[key].checkedForPlanning == true) {
+          truckCounter += 1;
+        }
+      }
+      setTrucksCount(truckCounter)
+      setTrucks(trucksList);
+    } catch(error) {
+      console.log('Error: ' + error)
+    }
+  }
+
+
+  function deliveriesPressHandler() {
+    navigation.navigate('Selección de entregas' , { deliveries })
+  }
+
+  function trucksPressHandler() {
+    navigation.navigate('Selección de transporte', { trucks })
+  }
+
+  async function startPlanning() {
+    try {
+      const planningData = {
+        deliveriesInfo: deliveries,
+        trucksInfo: trucks
+      }
+      let plan = await planningAlgorithm(planningData);
+    } catch(error) {
+      console.log(error)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -59,7 +164,21 @@ function PlanningScreen() {
         />
       </View>
       <View style={styles.dtContainer}>
-        <View style={styles.trucksContainer}>
+        <Pressable
+          onPress={() => {
+            trucksPressHandler();
+          }}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed
+                ? '#e2e2e2'
+                : 'white',
+              opacity: pressed
+                ? 0.75 : 1
+            },
+            styles.trucksContainer
+          ]}
+        >
           <View style={styles.dtTitleContainer}>
             <Text style={styles.dtText}>Transportes</Text>
             <Tooltip
@@ -87,10 +206,24 @@ function PlanningScreen() {
             </Tooltip>
           </View>
           <View style={styles.dtValueContainer}>
-            <Text style={styles.dtValue}>0</Text>
+            <Text style={styles.dtValue}>{truckCount}</Text>
           </View>
-        </View>
-        <View style={styles.deliveriesContainer}>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            deliveriesPressHandler();
+          }}
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed
+                ? '#e2e2e2'
+                : 'white',
+              opacity: pressed
+                ? 0.75 : 1
+            },
+            styles.deliveriesContainer
+          ]}
+        >
           <View style={styles.dtTitleContainer}>
             <Text style={styles.dtText}>Entregas</Text>
             <Tooltip
@@ -118,35 +251,38 @@ function PlanningScreen() {
             </Tooltip>
           </View>
           <View style={styles.dtValueContainer}>
-            <Text style={styles.dtValue}>0</Text>
+            <Text style={styles.dtValue}>{deliveryCount}</Text>
           </View>
-        </View>
+        </Pressable>
       </View>
       <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            provider={PROVIDER_GOOGLE}
-            initialRegion={{
-              latitude: -34.604593,
-              longitude: -58.428880,
-              latitudeDelta: 0.1822,
-              longitudeDelta: 0.0421,
-            }}
-            ref={mapRef}
-            onRegionChangeComplete={(region) => { 
-              if (!loaded) { 
-                if (region.latitude != -34.604593 || region.longitude != -58.428880) {
-                  mapRef.current.animateToRegion({latitude: -34.604593, longitude: -58.428880, latitudeDelta: 0.1822, longitudeDelta: 0.0421, }, 1)
-                }
-                setLoaded(true)
-              } 
-            }}
-          >
-            {markers.map((item, index) => (
-              <Marker key={index} title={item.name} coordinate={item.coordinates} />
-            ))}
-          </MapView>
-        </View>
+        <MapView
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          initialRegion={{
+            latitude: -34.604593,
+            longitude: -58.428880,
+            latitudeDelta: 0.1822,
+            longitudeDelta: 0.0421,
+          }}
+          ref={mapRef}
+          onRegionChangeComplete={(region) => { 
+            if (!loaded) { 
+              if (region.latitude != -34.604593 || region.longitude != -58.428880) {
+                mapRef.current.animateToRegion({latitude: -34.604593, longitude: -58.428880, latitudeDelta: 0.1822, longitudeDelta: 0.0421, }, 1)
+              }
+              setLoaded(true)
+            } 
+          }}
+        >
+          {markers.map((item, index) => (
+            <Marker key={index} title={item.name} coordinate={item.coordinates} />
+          ))}
+        </MapView>
+      </View>
+      <Button style={styles.button} onPress={startPlanning}>
+        Planificar
+      </Button>
     </View>
   );
 }
@@ -224,7 +360,13 @@ const styles = StyleSheet.create({
   },
   dtValueContainer: {
     alignItems: 'center'
-  }
+  },
+  button: {
+    minWidth: 120,
+    marginHorizontal: 8,
+    position: 'absolute',
+    bottom: 40,
+  },
 })
 
 export default PlanningScreen;

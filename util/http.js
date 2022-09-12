@@ -60,7 +60,8 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
       productLength: response.data[key].product.length,
       productStackability: response.data[key].product.stackability,
       productFragility: response.data[key].product.fragility,
-      searchField: response.data[key].product.productName + ',' + response.data[key].product.id + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province
+      searchField: response.data[key].product.productName + ',' + response.data[key].product.id + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province,
+      checkedForPlanning: false
     }
     deliveryObj.productWeight = (deliveryObj.productWeight === 0) ? '' : deliveryObj.productWeight;
     deliveryObj.productWidth = (deliveryObj.productWidth === 0) ? '' : deliveryObj.productWidth;
@@ -80,4 +81,34 @@ export async function storeDelivery(deliveryData) {
   const response = await axios.post(BACKEND_URL + '/api/bulk-upload', deliveryDataList);
   const id = response.data.id;
   return id;
+}
+
+export async function fetchTrucks() {
+  let url = BACKEND_URL + '/api/trucks'
+  console.log(url)
+  const response = await axios.get(url);
+  const trucks = [];
+  for(const key in response.data) {
+    const truckObj = {
+      key: key,
+      licensePlate: response.data[key].licensePlate,
+      truckDescription: 'CAMIONAZO FDA$@',
+      width: response.data[key].width,
+      length: response.data[key].length,
+      height: response.data[key].height,
+      maximumWeightCapacity: response.data[key].maximumWeightCapacity,
+      searchField: response.data[key].truckDescription + ',' + response.data[key].licensePlate,
+      checkedForPlanning: false
+    }
+    trucks.push(truckObj);
+  }
+  return trucks;
+}
+
+export async function planningAlgorithm(planningInfo) {
+  let url = BACKEND_URL + '/api/planning';
+  console.log(url)
+  console.log(planningInfo)
+  const response = await axios.post(url, planningInfo);
+  return response;
 }

@@ -5,37 +5,38 @@ import SearchComponent from '../../components/SearchComponent';
 import { fetchDeliveries } from '../../util/http';
 import Button from '../../components/Button'
 
-function TruckScreen({ navigation, route }) {
+function DeliveriesSelectionScreen({ navigation, route }) {
 
-  const [trucks, setTrucks] = useState();
+  const [deliveries, setDeliveries] = useState();
   const [searchText, setSearchText] = useState();
   const [flatItems, setFlatItems] = useState();
 
   useEffect(() => {
     const unsuscribe = navigation.addListener("focus", () => {
-      getTrucks(route.params.trucks);
+      getDeliveries(route.params.deliveries);
     });
     return unsuscribe;
   }, [navigation])
   
-  function trucksPressHandler(itemData) {
-    navigation.navigate('Detalle del transporte', { itemData })
+  function deliveriesPressHandler(itemData) {
+    navigation.navigate('Detalle de entrega', { itemData })
   }
 
   useEffect(() => {
-    getTrucks();
+    getDeliveries();
   }, []);
 
 
-  async function getTrucks(trucks) {
+  async function getDeliveries(deliveries) {
     try {
+
       const searchFilteredData = searchText
-        ? trucks.filter((x) =>
+        ? deliveries.filter((x) =>
                 x.searchField.toLowerCase().includes(searchText.toLowerCase())
           )
-        : trucks;
+        : deliveries;
 
-      setTrucks(trucks);
+      setDeliveries(deliveries);
       setFlatItems(searchFilteredData)
 
     } catch(error) {
@@ -46,50 +47,51 @@ function TruckScreen({ navigation, route }) {
   useEffect(() => {
     async function getSearchFilterData() {
     const searchFilteredData = searchText
-      ? trucks.filter((x) =>
+      ? deliveries.filter((x) =>
               x.searchField.toLowerCase().includes(searchText.toLowerCase())
         )
-      : trucks;
+      : deliveries;
       setFlatItems(searchFilteredData)
     }
     getSearchFilterData();
   }, [searchText]);
 
   function addAllPressHandler() {
-    let newTrucks = [...trucks];
-    for(const key in newTrucks) {
-      newTrucks[key].checkedForPlanning = true
+    let newDeliveries = [...deliveries];
+    for(const key in newDeliveries) {
+      newDeliveries[key].checkedForPlanning = true
     }
-    setTrucks(newTrucks);
+    setDeliveries(newDeliveries);
   }
 
   function removeAllPressHandler() {
-    let newTrucks = [...trucks];
-    for(const key in newTrucks) {
-      newTrucks[key].checkedForPlanning = false
+    let newDeliveries = [...deliveries];
+    for(const key in newDeliveries) {
+      newDeliveries[key].checkedForPlanning = false
     }
-    setTrucks(newTrucks);
+    setDeliveries(newDeliveries);
   }
 
-  function removeTruckPressHandler(item) {
-    let newTrucks = [...trucks];
-    for(const key in newTrucks) {
-      if(item.licensePlate == newTrucks[key].licensePlate) {
-        newTrucks[key].checkedForPlanning = !item.checkedForPlanning
+  function removeDeliveryPressHandler(item) {
+    let newDeliveries = [...deliveries];
+    for(const key in newDeliveries) {
+      if(item.deliveryid == newDeliveries[key].deliveryid) {
+        newDeliveries[key].checkedForPlanning = !item.checkedForPlanning
       }
     }
-    setTrucks(newTrucks);
+    setDeliveries(newDeliveries);
   }
 
   const submitHandler = () => {
-    navigation.navigate('Planificación', { trucks });
+
+    navigation.navigate('Planificación', { deliveries });
   }
    
 
   const renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        trucksPressHandler(item);
+        deliveriesPressHandler(item);
       }}
       style={({ pressed }) => [
         {
@@ -109,15 +111,15 @@ function TruckScreen({ navigation, route }) {
           checked={item.checkedForPlanning}
           checkedIcon="dot-circle-o"
           uncheckedIcon="circle-o"
-          onPress={() => removeTruckPressHandler(item)}
+          onPress={() => removeDeliveryPressHandler(item)}
         />
       </View>
       <View style={styles.rowMiddle}>
-        <Text style={styles.productText}>{item.truckDescription}</Text>
-        <Text numberOfLines={1} style={styles.locationText}>{item.licensePlate}</Text>
+        <Text style={styles.productText}>{item.productName}</Text>
+        <Text numberOfLines={1} style={styles.locationText}>{item.customerDistrict}, {item.customerProvince}</Text>
       </View>
       <View style={styles.rowRight}>
-        <Text style={styles.volumeText}>Capacidad {item.width * item.height * item.length / 1000000} m3</Text>
+        <Text style={styles.volumeText}>{item.productHeight * item.productWidth * item.productLength / 1000000} m2</Text>
       </View>
     </Pressable>
   )
@@ -269,4 +271,4 @@ const styles = StyleSheet.create({
     bottom: 40,
   },
 })
-export default TruckScreen;
+export default DeliveriesSelectionScreen;

@@ -298,9 +298,7 @@ function ARScreen({ navigation, route }) {
   };
 
   useEffect(() => {
-    async function arComplete() {
-      console.log("Llegue");
-      console.log("height:" + height.toString());
+    function arComplete() {
       route.params.inputValues.height = height.toString();
       route.params.inputValues.length = length.toString();
       route.params.inputValues.width = width.toString();
