@@ -4,6 +4,7 @@ import { CheckBox } from '@rneui/themed';
 import SearchComponent from '../../components/SearchComponent';
 import { fetchDeliveries } from '../../util/http';
 import Button from '../../components/Button'
+import AddButton from '../../components/AddButton';
 
 function TruckScreen({ navigation, route }) {
 
@@ -170,8 +171,9 @@ function TruckScreen({ navigation, route }) {
           extraData={flatItems}
           keyExtractor={item => item.key}
         />
+        <AddButton navigation={navigation} navigationScreen='Nuevo transporte' />
         <Button style={styles.button} onPress={submitHandler}>
-          Confirmar
+          OK
         </Button>
       </View>
     </View>
@@ -265,8 +267,9 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
     marginHorizontal: 8,
+    paddingRight: 80,
     position: 'absolute',
-    bottom: 40,
+    bottom: 30,
   },
 })
 export default TruckScreen;

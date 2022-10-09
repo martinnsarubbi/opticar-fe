@@ -105,7 +105,7 @@ function DeliveriesScreen({ navigation }) {
         <Text numberOfLines={1} style={styles.locationText}>{item.customerDistrict}, {item.customerProvince}</Text>
       </View>
       <View style={styles.rowRight}>
-        <Text style={styles.volumeText}>{item.productHeight * item.productWidth * item.productLength / 1000000} m2</Text>
+        <Text style={styles.volumeText}>{item.productHeight * item.productWidth * item.productLength / 1000000} m3</Text>
       </View>
     </Pressable>
   )

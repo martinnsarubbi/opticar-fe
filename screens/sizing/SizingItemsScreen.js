@@ -116,7 +116,7 @@ function SizingItemsScreen({ navigation, route }) {
           <Text style={styles.productText}>{item.productName}</Text>
         </View>
         <View style={styles.rowRight}>
-          <Text style={styles.volumeText}>{(item.productHeight * item.productWidth * item.productLength / 1000000).toFixed(2)} m2</Text>
+          <Text style={styles.volumeText}>{(item.productHeight * item.productWidth * item.productLength / 1000000).toFixed(2)} m3</Text>
         </View>
       </Pressable>
   )

@@ -5,6 +5,6 @@
   "minify": false,
   "urlRandomness": null,
   "https": false,
-  "scheme": "com.pfiuade.grupo1313131",
-  "devClient": true
+  "devClient": true,
+  "scheme": "com.pfiuade.grupo1313131"
 }

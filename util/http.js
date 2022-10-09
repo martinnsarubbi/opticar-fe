@@ -90,9 +90,9 @@ export async function fetchTrucks() {
   const trucks = [];
   for(const key in response.data) {
     const truckObj = {
-      key: key,
+      key: response.data[key].icensePlate,
       licensePlate: response.data[key].licensePlate,
-      truckDescription: 'CAMIONAZO FDA$@',
+      truckDescription: response.data[key].description,
       width: response.data[key].width,
       length: response.data[key].length,
       height: response.data[key].height,
@@ -110,5 +110,11 @@ export async function planningAlgorithm(planningInfo) {
   console.log(url)
   console.log(planningInfo)
   const response = await axios.post(url, planningInfo);
+  return response.data;
+}
+
+export async function storeTruck(truckData) {
+  console.log(BACKEND_URL + '/api/trucks', truckData)
+  const response = await axios.post(BACKEND_URL + '/api/trucks', truckData);
   return response;
 }

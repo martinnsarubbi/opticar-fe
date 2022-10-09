@@ -358,8 +358,8 @@ function NewDeliveryScreen({ navigation }) {
               placeholder='Largo'
               style={styles.allInputRow}
               textInputConfig={{
-                onChangeText: inputChangedHandler.bind(this, 'height'),
-                value: inputValues.height
+                onChangeText: inputChangedHandler.bind(this, 'large'),
+                value: inputValues.large
               }}
             />
             <Input
