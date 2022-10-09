@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { Scene, Mesh, MeshStandardMaterial, PerspectiveCamera , BoxGeometry, PointLight, PointLightHelper } from 'three';
 import { Renderer } from 'expo-three';
 import { GLView } from 'expo-gl';
-import { CURRENT_HOST } from '../../environment';
-import axios from 'axios';
 import Button from '../../components/Button';
+import { planningAlgorithm } from '../../util/http';
+import axios from 'axios';
+import { CURRENT_HOST } from '../../environment';
 
 const planningData = {
   "originLatitude": -34.66733,
@@ -271,6 +272,10 @@ function TruckLoadScreen() {
   const [camera, setCamera] = useState(null);
   const [plan, setPlan] = useState();
   
+  useEffect(() => {
+    startPlanning();
+  }, []);
+
   async function startPlanning() {
     try {
       const planningData = {
@@ -282,7 +287,7 @@ function TruckLoadScreen() {
       }
       let response = await planningAlgorithm(planningData);
       setPlan(response);
-      console.log(plan)
+      console.log("Llegue1")
     } catch (error) {
       console.log(error)
     }
@@ -347,10 +352,16 @@ function TruckLoadScreen() {
     const renderer = new Renderer({gl});
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    let response = await axios.post(CURRENT_HOST + '/api/planning', planningData);
+    console.log("Llegue3")
+
+    let plan = await axios.post(CURRENT_HOST + '/api/planning', planningData);
+    
+    setPlan(plan)
+    console.log(plan)
+    
     const divisor = 10;
 
-    const geometry = new BoxGeometry(response.data[0].truck.width/divisor, response.data[0].truck.height/divisor,response.data[0].truck.length/divisor)
+    const geometry = new BoxGeometry(plan.data[0].truck.width/divisor, plan.data[0].truck.height/divisor,plan.data[0].truck.length/divisor)
     const material = new MeshStandardMaterial({color: 'red', transparent: true, opacity: 0.2})
     const cube = new Mesh(geometry,material)
     cube.position.x = 0
@@ -364,22 +375,20 @@ function TruckLoadScreen() {
 
     camera.lookAt(-1,-1,-1)
 
-    
-
-    for(var i = 0; i < response.data[0].load.length; i++) {
-      const geometry = new BoxGeometry(response.data[0].load[i].width/divisor,response.data[0].load[i].height/divisor,response.data[0].load[i].length/divisor)
+    for(var i = 0; i < plan.data[0].load.length; i++) {
+      const geometry = new BoxGeometry(plan.data[0].load[i].width/divisor,plan.data[0].load[i].height/divisor,plan.data[0].load[i].length/divisor)
       const material = new MeshStandardMaterial({color: 'white', metalness: 1, roughness: 1})
       material.visible = true;
       const cube = new Mesh(geometry,material)
-      cube.position.x = - response.data[0].truck.width/divisor / 2 + response.data[0].load[i].position.c1.axisX/divisor + response.data[0].load[i].width/divisor / 2
-      cube.position.y = - response.data[0].truck.height/divisor / 2 + response.data[0].load[i].position.c1.axisZ/divisor + response.data[0].load[i].height/divisor / 2
-      cube.position.z = - response.data[0].truck.length/divisor / 2 + response.data[0].load[i].position.c1.axisY/divisor + response.data[0].load[i].length/divisor / 2
+      cube.position.x = - plan.data[0].truck.width/divisor / 2 + plan.data[0].load[i].position.c1.axisX/divisor + plan.data[0].load[i].width/divisor / 2
+      cube.position.y = - plan.data[0].truck.height/divisor / 2 + plan.data[0].load[i].position.c1.axisZ/divisor + plan.data[0].load[i].height/divisor / 2
+      cube.position.z = - plan.data[0].truck.length/divisor / 2 + plan.data[0].load[i].position.c1.axisY/divisor + plan.data[0].load[i].length/divisor / 2
       scene.add(cube)
       const edges = new THREE.EdgesGeometry( geometry );
       const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 'black' } ) );
-      line.position.x = - response.data[0].truck.width/divisor / 2 + response.data[0].load[i].position.c1.axisX/divisor + response.data[0].load[i].width/divisor / 2
-      line.position.y = - response.data[0].truck.height/divisor / 2 + response.data[0].load[i].position.c1.axisZ/divisor + response.data[0].load[i].height/divisor / 2
-      line.position.z = - response.data[0].truck.length/divisor / 2 + response.data[0].load[i].position.c1.axisY/divisor + response.data[0].load[i].length/divisor / 2
+      line.position.x = - plan.data[0].truck.width/divisor / 2 + plan.data[0].load[i].position.c1.axisX/divisor + plan.data[0].load[i].width/divisor / 2
+      line.position.y = - plan.data[0].truck.height/divisor / 2 + plan.data[0].load[i].position.c1.axisZ/divisor + plan.data[0].load[i].height/divisor / 2
+      line.position.z = - plan.data[0].truck.length/divisor / 2 + plan.data[0].load[i].position.c1.axisY/divisor + plan.data[0].load[i].length/divisor / 2
       scene.add( line );
     }
 

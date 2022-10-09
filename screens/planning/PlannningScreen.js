@@ -212,6 +212,7 @@ function PlanningScreen({ navigation, route }) {
 
   async function startPlanning() {
     try {
+      //TODO: filtrar las deliveries y los trucks que no se eligieron en las pantallas de eleccion
       const planningData = {
         deliveriesInfo: deliveries,
         trucksInfo: trucks,

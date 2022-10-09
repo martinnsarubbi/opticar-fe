@@ -24,7 +24,7 @@ function TruckScreen({ navigation, route }) {
   }
 
   useEffect(() => {
-    getTrucks();
+    getTrucks(trucks);
   }, []);
 
 
