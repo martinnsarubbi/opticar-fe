@@ -47,7 +47,9 @@ function ModulesScreen({ navigation }) {
           colors={['#2EB62C', '#ABE098']}
           style={styles.moduleContainer}
         >
-          <Text style={styles.moduleTitle}>Seguimiento</Text>
+          <Pressable onPress={() => navigation.navigate('Seguimiento')}>
+            <Text style={styles.moduleTitle}>Seguimiento</Text>
+          </Pressable>
         </LinearGradient>
       </View>
     </ScrollView>

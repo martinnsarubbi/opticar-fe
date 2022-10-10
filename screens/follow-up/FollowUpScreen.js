@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable, Image } from 'react-native';
-import { Scene, Mesh, MeshStandardMaterial, PerspectiveCamera , BoxGeometry, PointLight, PointLightHelper } from 'three';
-import { Renderer } from 'expo-three';
-import { GLView } from 'expo-gl';
-import Button from '../../components/Button';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView, FlatList, ImageEditor } from 'react-native';
 import { planningAlgorithm } from '../../util/http';
 import { CheckBox } from '@rneui/themed';
-import Modal from 'react-native-modal';
-import OrbitControlsView from '../../components/orbit-controls/OrbitControlsView';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+import { GOOGLE_API_KEY } from '../../environment'; 
 
 const planningData = {
   "originLatitude": -34.66733,
@@ -268,49 +265,27 @@ const planningData = {
   ]
 }
 
-function TruckLoadScreen() {
+
+function FollowUpScreen() {
   
-  const [camera, setCamera] = useState(null);
   const [plan, setPlan] = useState();
   const [deliveries, setDeliveries] = useState();
   const [truck, setTruck] = useState();
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
-
-  useEffect(() => {
-    startPlanning();
-  }, []);
-
-  async function startPlanning() {
-    try {
-      console.log("Llegue0")
-      let response = await planningAlgorithm(planningData);
-      setPlan(response);
-      console.log("Llegue1");
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  function tripPressHandler(trip) {
-    setDeliveries(trip.load);
-    var arr = []
-    arr.push(trip)
-    setTruck(arr)
-    console.log(arr);
-  }
-
-  uiCheckPressHandler
-  function uiCheckPressHandler(item) {
-    let newDeliveries = [...deliveries];
-    for(const key in deliveries) {
-      if(item.key == newDeliveries[key].key) {
-        newDeliveries[key].uiCheck = !item.uiCheck
-      }
-    }
-    setDeliveries(newDeliveries);
-  }
-
+  const mapRef = useRef(null);
+  const [originalOriginLocation, setOriginalOriginLocation] = useState({})
+  const [originLocation, setOriginLocation] = useState({
+    latitude: -34.604593,
+    longitude: -58.428880,
+    latitudeDelta: 0.1822,
+    longitudeDelta: 0.0421,
+  })
+  const [waypoints, setWaypoints] = useState([{}]);
+  const [planningMarkers, setPlanningMarkers] = useState([{}]);
+  const [loaded, setLoaded] = useState(false);
+  const [markers, setMarkers] = useState([{ coordinates: { latitude: 37.78383, longitude: -122.405766 } }]);
+  
   const renderTrucklItem = ({item}) => (
     <View style={{flex: 1, backgroundColor: 'white', width: 80, height: 100, flexDirection: 'column', alignItems:'center', padding: 10, margin: 10, borderRadius: 10, shadowColor: 'black', shadowOpacity: 1}}>
       <Pressable
@@ -328,11 +303,116 @@ function TruckLoadScreen() {
         </View>
       </Pressable>
     </View>
-  
   )
+
+
+  useEffect(() => {
+    startPlanning();
+  }, []);
+
+  async function startPlanning() {
+    try {
+      console.log("Llegue0")
+      let response = await planningAlgorithm(planningData);
+      setPlan(response);
+      if(response[0] !== undefined) {
+        const coordinatesObj = {
+          coordinates: {
+            longitude: response[0].initialLongitude,
+            latitude: response[0].initialLatitude,
+          },
+          name: "Punto de origen",
+          color: 'blue'
+        }
+        setMarkers(prevState => [...prevState, coordinatesObj]);
+        setOriginLocation({
+          longitude: response[0].initialLongitude,
+          latitude: response[0].initialLatitude,
+        })
+        setOriginalOriginLocation({
+          longitude: response[0].initialLongitude,
+          latitude: response[0].initialLatitude,
+        })
+      }
+      console.log("Llegue1");
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  function tripPressHandler(trip) {
+    setDeliveries(trip.load);
+    var arr = []
+    arr.push(trip)
+    setTruck(arr)
+    let waypointsArray = []
+    for(let i = 0; i < trip.load.length; i++) {
+        const coordinatesObj = {
+          coordinates: {
+            longitude: trip.load[i].orderedDelivery.delivery.customer.longitude,
+            latitude: trip.load[i].orderedDelivery.delivery.customer.latitude
+          },
+          name: trip.load[i].orderedDelivery.delivery.customer.address,
+          color: 'red'
+        }
+        setMarkers(prevState => [...prevState, coordinatesObj]);
+      let coordinate = {
+        latitude: trip.load[i].orderedDelivery.delivery.customer.latitude,
+        longitude: trip.load[i].orderedDelivery.delivery.customer.longitude,
+      }
+      waypointsArray.push(coordinate);
+    }
+    setWaypoints(waypointsArray)
+    setOriginLocation({
+      longitude: trip.initialLongitude,
+      latitude: trip.initialLatitude,
+    })
+
+  }
+
+  function directionPressHandler(item) {
+    
+    let waypointsArray = []
+    let coordinate = {
+      latitude: item.orderedDelivery.delivery.customer.latitude,
+      longitude: item.orderedDelivery.delivery.customer.longitude,
+    }
+    console.log(coordinate)
+    waypointsArray.push(coordinate);
+
+    for(let i = 0; i < deliveries.length; i++) {
+      if(deliveries[i].orderedDelivery.position === (item.orderedDelivery.position - 1)) {
+        console.log("!!!" + deliveries[i].orderedDelivery.position + "!!!" + (item.orderedDelivery.position - 1))
+        setOriginLocation({
+          longitude: deliveries[i].orderedDelivery.delivery.customer.longitude,
+          latitude: deliveries[i].orderedDelivery.delivery.customer.latitude
+        })
+      } else if (deliveries.length === i-1)(
+        setOriginLocation(originalOriginLocation)
+      )
+    }
+
+    setWaypoints(waypointsArray)
+
+  }
+
+  console.log(waypoints)
+  console.log(originLocation)
+
+
+  function uiCheckPressHandler(item) {
+    let newDeliveries = [...deliveries];
+    for(const key in deliveries) {
+      if(item.key == newDeliveries[key].key) {
+        newDeliveries[key].uiCheck = !item.uiCheck
+      }
+    }
+    setDeliveries(newDeliveries);
+  }
 
   const renderDeliveryItem = ({item}) => (
     <Pressable
+    onPress={() => directionPressHandler(item)}
       style={({ pressed }) => [
         {
           backgroundColor: pressed
@@ -361,133 +441,10 @@ function TruckLoadScreen() {
     </Pressable>
   )
 
-  const renderView = ({item}) => (
-    <OrbitControlsView style={{width: 290, height: 290}} camera={camera}>
-      <GLView 
-        onContextCreate={gl => {
-          onContextCreate(gl, {item}, item.key-1);
-        }}
-        style={{width: 290, height: 290, borderRadius: 80}}
-      />
-    </OrbitControlsView>
-
-  )
-  
-  function onContextCreate(gl, plan, tripNumber) {
-    var x = plan.item
-    console.log("tripNumber: " + tripNumber)
-    console.log("x:" + x)
-    console.log(x);
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(
-      75,
-      gl.drawingBufferWidth/gl.drawingBufferHeight,
-      0.6,
-      1200
-    );
-    gl.canvas = { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight}
-    camera.position.z = 30;
-    camera.position.y = 30;
-    camera.position.x = 30;
-
-    const renderer = new Renderer({gl});
-    renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-    console.log("Llegue3")
-
-    console.log("Llegue4")
-
-    const divisor = 10;
-    const geometry = new BoxGeometry(x.truck.width/divisor, x.truck.height/divisor,x.truck.length/divisor)
-    const material = new MeshStandardMaterial({color: 'red', transparent: true, opacity: 0.2})
-    const cube = new Mesh(geometry,material)
-    cube.position.x = 0
-    cube.position.y = 0
-    cube.position.z = 0
-    scene.add(cube);
-
-    const edges = new THREE.EdgesGeometry( geometry );
-    const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 'black' } ) );
-    scene.add( line );
-
-    camera.lookAt(-1,-1,-1)
-
-    for(var i = 0; i < x.load.length; i++) {
-      const geometry = new BoxGeometry(x.load[i].width/divisor,x.load[i].height/divisor,x.load[i].length/divisor)
-      const material = new MeshStandardMaterial({color: 'white', metalness: 1, roughness: 1})
-      material.visible = true;
-      const cube = new Mesh(geometry,material)
-      cube.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
-      cube.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
-      cube.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
-      scene.add(cube)
-      const edges = new THREE.EdgesGeometry( geometry );
-      const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 'black' } ) );
-      line.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
-      line.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
-      line.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
-      scene.add( line );
-    }
-
-    const lights = []; // Storage for lights
-    const lightHelpers = []; // Storage for light helpers
-
-    const lightValues = [
-      {colour: 0x38E000, intensity: 8, dist: 500, x: 100, y: 100, z: 100},
-      {colour: 0x38E000, intensity: 8, dist: 500, x: -100, y: -100, z: -100},
-    ];
-
-    for (let i=0; i<2; i++) {
-      // Loop 6 times to add each light to lights array
-      // using the lightValues array to input properties
-      lights[i] = new PointLight(
-        lightValues[i]['colour'], 
-        lightValues[i]['intensity'], 
-        lightValues[i]['dist']
-      );
-    
-      lights[i].position.set(
-        lightValues[i]['x'], 
-        lightValues[i]['y'], 
-        lightValues[i]['z']
-      );
-    
-      scene.add(lights[i]);
-
-      // Add light helpers for each light
-      lightHelpers[i] = new PointLightHelper(lights[i]);
-      scene.add(lightHelpers[i]);
-    };
-
-    setCamera(camera);
-    
-    var id;
-    const render = ()=> {
-      id = requestAnimationFrame(render);
-      //scene.rotation.z -= 0.005;
-      //scene.rotation.x -= 0.01;
-      renderer.render(scene, camera)
-      gl.endFrameEXP()
-    }
-
-    render()
-
-  }
-  
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 0.7}}>
         <View style={{flex: 1, flexDirection: 'row'}}>
-          <View>
-            <FlatList
-              data={truck}
-              renderItem={renderView}
-              scrollEnabled={false}
-              extraData={truck}
-              keyExtractor={item => item.key}
-              style={{flex: 1, marginBottom: 20, backgroundColor: 'white', width: '100%'}}
-            />
-          </View>
           <View>
             <FlatList
               data={plan}
@@ -496,6 +453,39 @@ function TruckLoadScreen() {
               keyExtractor={item => item.key}
               style={{flex: 1, height: 300, width: 100}}
             />
+          </View>
+          <View style={{ height: 250, width: 300}}>
+            <MapView
+              style={styles.map}
+              provider={PROVIDER_GOOGLE}
+              initialRegion={{
+                latitude: -34.604593,
+                longitude: -58.428880,
+                latitudeDelta: 0.1822,
+                longitudeDelta: 0.0421,
+              }}
+              ref={mapRef}
+              onRegionChangeComplete={(region) => {
+                if (!loaded) {
+                  if (region.latitude != -34.604593 || region.longitude != -58.428880) {
+                    mapRef.current.animateToRegion({ latitude: -34.604593, longitude: -58.428880, latitudeDelta: 0.1822, longitudeDelta: 0.0421, }, 1)
+                  }
+                  setLoaded(true)
+                }
+              }}
+            >
+              <MapViewDirections
+                origin={originLocation}
+                waypoints={waypoints}
+                destination={originLocation}
+                apikey={GOOGLE_API_KEY}
+                strokeWidth={3}
+                strokeColor="blue"
+              />
+              {markers.map((item, index) => (
+                <Marker key={index} title={item.name} coordinate={item.coordinates} pinColor={item.color} />
+              ))}
+            </MapView>
           </View>
         </View>
       </View>
@@ -507,18 +497,6 @@ function TruckLoadScreen() {
           keyExtractor={item => item.key}
           style={{flex: 1, marginBottom: 20, backgroundColor: 'white'}}
         />
-        
-        <Button style={{height: 100}} title="Hide modal" onPress={handleModal}>
-          Confirmar
-        </Button>
-        <Modal isVisible={isModalVisible}>
-          <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center', marginTop: 200, marginBottom: 450, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
-            <Text style={{fontSize: 15}}>Se han cargado todos los productos al transporte. Por favor, precinte el camión.</Text>
-            <Button title="Hide modal" onPress={handleModal} style={{marginTop: 10}}>
-              OK
-            </Button>
-          </View>
-        </Modal>
       </View>
     </View>
   );
@@ -563,6 +541,15 @@ const styles = StyleSheet.create({
   volumeText: {
     textAlign: 'right',
   },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  mapContainer: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    borderRadios: 30
+  },
 })
 
-export default TruckLoadScreen;
+export default FollowUpScreen;

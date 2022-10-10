@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image, FlatList } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Icon, Tooltip } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker';
@@ -212,7 +212,6 @@ function PlanningScreen({ navigation, route }) {
 
   async function startPlanning() {
     try {
-      //TODO: filtrar las deliveries y los trucks que no se eligieron en las pantallas de eleccion
       const planningData = {
         deliveriesInfo: deliveries,
         trucksInfo: trucks,
@@ -251,6 +250,28 @@ function PlanningScreen({ navigation, route }) {
 
   const renderDeliveryItem = ({item}) => (
     <Pressable
+      style={({ pressed }) => [
+        {
+          backgroundColor: pressed
+            ? '#e2e2e2'
+            : 'white',
+          opacity: pressed
+            ? 0.75 : 1
+        },
+        styles.rowContainer
+      ]}
+    >
+      <View style={styles.rowMiddle}>
+        <Text style={styles.productText}>{item.orderedDelivery.delivery.product.productName}</Text>
+      </View>
+      <View style={styles.rowRight}>
+        <Text style={styles.volumeText}>{(item.height * item.width * item.length / 1000000).toFixed(2)} m3</Text>
+      </View>
+    </Pressable>
+  )
+
+  const renderItem = ({item}) => (
+    <Pressable
       onPress={() => {
         trucksPressHandler(item);
       }}
@@ -284,7 +305,6 @@ function PlanningScreen({ navigation, route }) {
       </View>
     </Pressable>
   )
-
 
   return (
     <View style={styles.container}>

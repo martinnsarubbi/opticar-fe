@@ -107,8 +107,6 @@ export async function fetchTrucks() {
 
 export async function planningAlgorithm(planningInfo) {
   let url = BACKEND_URL + '/api/planning';
-  console.log(url)
-  console.log(planningInfo)
   const response = await axios.post(url, planningInfo);
   return response.data;
 }
