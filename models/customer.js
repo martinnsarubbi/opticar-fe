@@ -1,5 +1,5 @@
 class Customer {
-  constructor(id, name, surname, address, longitude, latitude, deliveries) {
+  constructor(id, name, surname, address, longitude, latitude, deliveries, department) {
     this.id = id;
     this.name = name;
     this.surname = surname;
@@ -7,6 +7,7 @@ class Customer {
     this.longitude = longitude;
     this.latitude = latitude;
     this.deliveries = deliveries;
+    this.department = department;
   }
 }
 

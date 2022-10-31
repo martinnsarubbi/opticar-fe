@@ -14,6 +14,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
     customerProvince: props.route.params.itemData.customerProvince,
     customerName: props.route.params.itemData.customerName,
     customerSurname: props.route.params.itemData.customerSurname,
+    customerDepartment: props.route.params.itemData.customerDepartment,
     dni: props.route.params.itemData.customerDni,
     telephone: props.route.params.itemData.customerTelephone,
     productId: props.route.params.itemData.productId,
@@ -25,6 +26,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
     productLength: props.route.params.itemData.productLength.toString(),
     productStackability: (props.route.params.itemData.productStackability === 'Si') ? true : false,
     productFragility: (props.route.params.itemData.productFragility === 'Si') ? true : false,
+    productRotability: (props.route.params.itemData.productRotability === 'Si') ? true: false,
     deliveryid: props.route.params.itemData.deliveryid,
     status: props.route.params.itemData.status,
     latitudeDelta: 0.0059,
@@ -32,6 +34,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false);
+  const [rotabilityTooltipOpen, setRotableTooltipOpen] = useState(false);
 
   const mapRef = useRef(null);
   const [loaded, setLoaded] = useState(false)
@@ -46,7 +49,8 @@ function DeliveriesDetailScreen(props, { navigation }) {
       customerProvince: locationDetails.province,
       productName: props.route.params.itemData.productName,
       customerName: props.route.params.itemData.customerName,
-      customerSurname: props.route.params.itemData.customerSurname
+      customerSurname: props.route.params.itemData.customerSurname,
+      customerDepartment: props.route.params.itemData.customerDepartment
     };
     setMarker(customerDetails);
   };
@@ -154,6 +158,17 @@ function DeliveriesDetailScreen(props, { navigation }) {
             style={styles.allInputRow}
           />
         </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='Piso/Departamento'
+            placeholder='-'
+            textInputConfig={{
+              editable: false,
+              value: marker.customerDepartment
+            }}
+            style={styles.allInputRow}
+          />
+        </View>
         <View style={styles.titleContainer}>
           <Text style={styles.sectionTitle}>Producto</Text>
         </View>
@@ -197,7 +212,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
           <View style={styles.halfInputRow}>
             <Input
               label='Alto (cm)'
-              placeholder='Alto'
+              placeholder='-'
               textInputConfig={{
                 editable: false,
                 value: marker.productHeight
@@ -206,7 +221,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
             />
             <Input
               label='Ancho (cm)'
-              placeholder='Ancho'
+              placeholder='-'
               textInputConfig={{
                 editable: false,
                 value: marker.productWidth
@@ -217,7 +232,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
           <View style={styles.halfInputRow}>
             <Input
               label='Largo (cm)'
-              placeholder='Largo'
+              placeholder='-'
               textInputConfig={{
                 editable: false,
                 value: marker.productHeight
@@ -226,7 +241,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
             />
             <Input
               label='Peso (kg)'
-              placeholder='Peso'
+              placeholder='-'
               textInputConfig={{
                 editable: false,
                 value: marker.productWeight
@@ -288,6 +303,39 @@ function DeliveriesDetailScreen(props, { navigation }) {
                 popover={<Text>
                   Si es un producto que puede apilar otro producto igual a sí mismo, marcá esta opción.
                   Tené en cuenta que el producto debe apilarse sobre otro producto igual a él sin romper al producto de abajo.
+                </Text>}
+              >
+                <Icon
+                  name='info-with-circle'
+                  color='grey'
+                  type='entypo'
+                />
+              </Tooltip>
+            </View>
+          </View>
+          <View style={styles.halfInputRow}>
+            <View style={styles.checkBoxContainer}>
+              <CheckBox
+                center
+                accessibilityRole='button'
+                title="Rotable"
+                checked={marker.productRotabiltiy}
+              />
+              <Tooltip
+                visible={rotabilityTooltipOpen}
+                onOpen={() => {
+                  setRotableTooltipOpen(true);
+                }}
+                onClose={() => {
+                  setRotableTooltipOpen(false);
+                }}
+                width={300}
+                height={130}
+                backgroundColor='white'
+                overlayColor='#93a2b899'
+                popover={<Text>
+                  Elegí esta opción si el producto puede apoyarse sobre cualquiera de sus caras dentro del transporte. En el caso de que el producto no pueda
+                  posicionarse lateralmente, no marques esta opción.
                 </Text>}
               >
                 <Icon

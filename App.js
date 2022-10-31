@@ -21,6 +21,7 @@ import FollowUpScreen from './screens/follow-up/FollowUpScreen';
 
 
 const Stack = createNativeStackNavigator();
+console.disableYellowBox = true;
 
 export default function App() {
 

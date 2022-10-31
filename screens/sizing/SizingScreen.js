@@ -18,9 +18,11 @@ function SizingScreen({ navigation, route }) {
 
   const [fragility, setFragility] = useState((route.params?.itemData?.productFragility) ? route.params?.itemData?.productFragility : false);
   const [stackability, setStackability] = useState((route.params?.itemData?.productStackability) ? route.params?.itemData?.productStackability : false);
+  const [rotability, setRotability] = useState((route.params?.itemData?.productRotability) ? route.params?.itemData?.productRotability : false);
   const [ocrTooltipOpen, setOcrTooltipOpen] = useState(false); 
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
+  const [rotableTooltipOpen, setRotableTooltipOpen] = useState(false);
 
   useEffect(() => {
     if (route.params?.data) {
@@ -291,6 +293,41 @@ function SizingScreen({ navigation, route }) {
                 color='grey'
                 type='entypo'
               />
+            </Tooltip>
+          </View>
+        </View>
+        <View style={styles.halfInputRow}>
+          <View style={styles.checkBoxContainer}>
+            <CheckBox
+              center
+              accessibilityRole='button'
+              title="Rotable"
+              checked={rotability}
+              onPress={() => setRotability(!rotability)}
+            />
+            <Tooltip
+              visible={rotableTooltipOpen}
+              onOpen={() => {
+                setRotableTooltipOpen(true);
+              }}
+              onClose={() => {
+                setRotableTooltipOpen(false);
+              }}
+              width={300}
+              height={100}
+              backgroundColor='white'
+              overlayColor='#93a2b899'
+              popover={<Text>
+                Elegí esta opción si el producto puede apoyarse sobre cualquiera de sus caras dentro del transporte. En el caso de que el producto no pueda
+                posicionarse lateralmente, no marques esta opción.
+              </Text>}
+            >
+              <Icon
+                name='info-with-circle'
+                color='grey'
+                type='entypo'
+              />
+                        
             </Tooltip>
           </View>
         </View>

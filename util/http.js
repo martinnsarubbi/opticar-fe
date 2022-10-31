@@ -51,6 +51,7 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
       customerLatitude: parseFloat(response.data[key].customer.latitude),
       customerDistrict: response.data[key].customer.district,
       customerProvince: response.data[key].customer.province,
+      customerDepartment: response.data[key].customer.department,
       productName: response.data[key].product.productName,
       productCategory: response.data[key].product.category,
       productId: response.data[key].product.id,
@@ -59,6 +60,7 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
       productHeight: response.data[key].product.height,
       productLength: response.data[key].product.length,
       productStackability: response.data[key].product.stackability,
+      productRotability: response.data[key].product.rotability,
       productFragility: response.data[key].product.fragility,
       searchField: response.data[key].product.productName + ',' + response.data[key].product.id + ',' +response.data[key].customer.district + ',' + response.data[key].customer.province,
       checkedForPlanning: false
@@ -69,6 +71,7 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
     deliveryObj.productLength = (deliveryObj.productLength === 0) ? '' : deliveryObj.productLength;
     deliveryObj.productFragility = (deliveryObj.productFragility === 'true') ? true : false;
     deliveryObj.productStackability = (deliveryObj.productStackability === 'true') ? true : false;
+    deliveryObj.productRotability = (deliveryObj.productRotability === 'true') ? true : false;
     deliveries.push(deliveryObj);
   }
   return deliveries;
@@ -106,7 +109,7 @@ export async function fetchTrucks() {
 }
 
 export async function planningAlgorithm(planningInfo) {
-  let url = BACKEND_URL + '/api/planning';
+  let url = BACKEND_URL + '/api/planning-algorithm';
   const response = await axios.post(url, planningInfo);
   return response.data;
 }
@@ -115,4 +118,31 @@ export async function storeTruck(truckData) {
   console.log(BACKEND_URL + '/api/trucks', truckData)
   const response = await axios.post(BACKEND_URL + '/api/trucks', truckData);
   return response;
+}
+
+export async function savePlan(plan, originLocation) {
+  console.log(plan);
+  console.log(originLocation);
+  console.log(BACKEND_URL + '/api/trucks', plan);
+  const response = await axios.post(BACKEND_URL + '/api/planning', plan);
+  console.log(response);
+  return response;
+}
+
+export async function getPlan(planDate) {
+  let url = BACKEND_URL + '/api/planning/' + planDate;
+  const response = await axios.get(url);
+  return response.data;
+}
+
+export async function deletePlan(planDate) {
+  let url = BACKEND_URL + '/api/planning/' + planDate;
+  const response = await axios.delete(url);
+  return response.data;
+}
+
+export async function updatePlanStatus(planDate, newStatus) {
+  let url = BACKEND_URL + '/api/planning/' + planDate + '/' + newStatus;
+  const response = await axios.put(url);
+  return response.data;
 }

@@ -33,6 +33,7 @@ function NewDeliveryScreen({ navigation }) {
     description: '',
     neighborhood: '',
     province: '',
+    department: '',
     name: '',
     surname: '',
     dni: '',
@@ -47,10 +48,12 @@ function NewDeliveryScreen({ navigation }) {
     large: '',
     stackability: false,
     fragility: false,
+    rotability: false,
     screen: 'NewDeliveryScreen'
   });
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
+  const [rotableTooltipOpen, setRotableTooltipOpen] = useState(false);
 
   useEffect(() => {
     async function updateProduct() {
@@ -73,6 +76,7 @@ function NewDeliveryScreen({ navigation }) {
               large: searchFilteredData[0].productLength.toString(),
               stackability: searchFilteredData[0].productStackability,
               fragility: searchFilteredData[0].productFragility,
+              rotability: searchFilteredData[0].productRotability
             }))
           }
         }
@@ -225,6 +229,17 @@ function NewDeliveryScreen({ navigation }) {
             textInputConfig={{
               onChangeText: inputChangedHandler.bind(this, 'neighborhood'),
               value: inputValues.neighborhood
+            }}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='Piso/Departamento'
+            placeholder='Ingrese piso y/o departamento'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'department'),
+              value: inputValues.department
             }}
           />
         </View>
@@ -441,6 +456,44 @@ function NewDeliveryScreen({ navigation }) {
                   color='grey'
                   type='entypo'
                 />
+              </Tooltip>
+            </View>
+          </View>
+          <View style={styles.halfInputRow}>
+            <View style={styles.checkBoxContainer}>
+              <CheckBox
+                center
+                accessibilityRole='button'
+                title="Rotable -       Opcional"
+                checked={inputValues.rotability}
+                onPress={() => setInputValues((curInputValues) => ({
+                    ...curInputValues,
+                    rotability: !inputValues.rotability
+                }))}
+              />
+              <Tooltip
+                visible={rotableTooltipOpen}
+                onOpen={() => {
+                  setRotableTooltipOpen(true);
+                }}
+                onClose={() => {
+                  setRotableTooltipOpen(false);
+                }}
+                width={300}
+                height={100}
+                backgroundColor='white'
+                overlayColor='#93a2b899'
+                popover={<Text>
+                  Elegí esta opción si el producto puede apoyarse sobre cualquiera de sus caras dentro del transporte. En el caso de que el producto no pueda
+                  posicionarse lateralmente, no marques esta opción.
+                </Text>}
+              >
+                <Icon
+                  name='info-with-circle'
+                  color='grey'
+                  type='entypo'
+                />
+                          
               </Tooltip>
             </View>
           </View>

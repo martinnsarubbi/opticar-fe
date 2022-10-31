@@ -6,7 +6,7 @@ function HomeHeader() {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.textStyle}>Login</Text>
+        <Text style={styles.textStyle}>Menu</Text>
       </View>
     </View>
   );

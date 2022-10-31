@@ -4,272 +4,17 @@ import { Scene, Mesh, MeshStandardMaterial, PerspectiveCamera , BoxGeometry, Poi
 import { Renderer } from 'expo-three';
 import { GLView } from 'expo-gl';
 import Button from '../../components/Button';
-import { planningAlgorithm } from '../../util/http';
+import { getPlan, updatePlanStatus  } from '../../util/http';
 import { CheckBox } from '@rneui/themed';
 import Modal from 'react-native-modal';
 import OrbitControlsView from '../../components/orbit-controls/OrbitControlsView';
-
-const planningData = {
-  "originLatitude": -34.66733,
-  "originLongitude": -58.4397737,
-  "originDescription": "Centro de Ditribución X S.A.",
-  "deliveriesInfo":[
-     {
-        "key":"0",
-        "deliveryid":1000000,
-        "status":"Pendiente de planificar",
-        "customerName":"Martin",
-        "customerSurname":"Sarubbi",
-        "customerAddress":"Serrano 557",
-        "customerDni":"33944674",
-        "customerTelephone":"2719414137",
-        "customerLongitude":-58.4491481,
-        "customerLatitude":-34.5977777,
-        "customerDistrict":"Villa Crespo",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Aire Acondicionado Split Candy CY3400FC - 3000F",
-        "productCategory":"Heladera",
-        "productId":"160841",
-        "productWeight":130,
-        "productWidth":91.2,
-        "productHeight":179,
-        "productLength":73.8,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Aire Acondicionado Split Candy CY3400FC - 3000F,160841,Villa Crespo,Ciudad de Buenos Aires",
-        "checkedForPlanning":true,
-        "initialLatitude": -34.5977777,
-        "initialLongitude": -58.4491481
-     },
-     {
-        "key":"1",
-        "deliveryid":1000001,
-        "status":"Pendiente de planificar",
-        "customerName":"Juan",
-        "customerSurname":"Rodriguez",
-        "customerAddress":"Medina 631",
-        "customerDni":"34304059",
-        "customerTelephone":"3435620199",
-        "customerLongitude":-58.4847839,
-        "customerLatitude":-34.6427886,
-        "customerDistrict":"Parque Avellaneda",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Freezer Gafa Eternity L290 AB 285Lt",
-        "productCategory":"Heladera",
-        "productId":"161088",
-        "productWeight":47,
-        "productWidth":61.4,
-        "productHeight":142.7,
-        "productLength":62.1,
-        "productStackability":true,
-        "productFragility":false,
-        "searchField":"Freezer Gafa Eternity L290 AB 285Lt,161088,Parque Avellaneda,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"2",
-        "deliveryid":1000002,
-        "status":"Pendiente de planificar",
-        "customerName":"Joaquín",
-        "customerSurname":"Perez",
-        "customerAddress":"Nogoyá 3132",
-        "customerDni":"27045921",
-        "customerTelephone":"5408152148",
-        "customerLongitude":-58.4927018,
-        "customerLatitude":-34.6039772,
-        "customerDistrict":"Villa del Parque",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-        "productCategory":"TV",
-        "productId":"502158",
-        "productWeight":20.9,
-        "productWidth":144.9,
-        "productHeight":9.6,
-        "productLength":28.2,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"3",
-        "deliveryid":1000005,
-        "status":"Pendiente de planificar",
-        "customerName":"Pablo",
-        "customerSurname":"Gonzalez",
-        "customerAddress":"Sta. Magdalena 377",
-        "customerDni":"15673490",
-        "customerTelephone":"7387098113",
-        "customerLongitude":-58.3834447,
-        "customerLatitude":-34.6471401,
-        "customerDistrict":"Barracas",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Panel De Tv 128 Tabaco",
-        "productCategory":"Mueble",
-        "productId":"1490453",
-        "productWeight":39,
-        "productWidth":138,
-        "productHeight":12,
-        "productLength":47,
-        "productStackability":true,
-        "productFragility":false,
-        "searchField":"Panel De Tv 128 Tabaco,1490453,Barracas,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"4",
-        "deliveryid":1000006,
-        "status":"Pendiente de planificar",
-        "customerName":"Martin",
-        "customerSurname":"Sarubbi",
-        "customerAddress":"Serrano 557",
-        "customerDni":"33944674",
-        "customerTelephone":"2719414137",
-        "customerLongitude":-58.4491481,
-        "customerLatitude":-34.5977777,
-        "customerDistrict":"Villa Crespo",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Aire Acondicionado Split Candy CY3400FC - 3000F",
-        "productCategory":"Heladera",
-        "productId":"160841",
-        "productWeight":130,
-        "productWidth":91.2,
-        "productHeight":179,
-        "productLength":73.8,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Aire Acondicionado Split Candy CY3400FC - 3000F,160841,Villa Crespo,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"5",
-        "deliveryid":1000036,
-        "status":"Pendiente de planificar",
-        "customerName":"Olivia",
-        "customerSurname":"Candia",
-        "customerAddress":"Sta. Catalina 1522",
-        "customerDni":"23000232",
-        "customerTelephone":"4820493276",
-        "customerLongitude":-58.4228897,
-        "customerLatitude":-34.6543561,
-        "customerDistrict":"Nueva Pompeya",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full",
-        "productCategory":null,
-        "productId":"94TO8020I",
-        "productWeight":"",
-        "productWidth":18.01,
-        "productHeight":16.03,
-        "productLength":39.37,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full,94TO8020I,Nueva Pompeya,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-      "key":"6",
-      "deliveryid":1000037,
-      "status":"Pendiente de planificar",
-      "customerName":"Olivia",
-      "customerSurname":"Candia",
-      "customerAddress":"Sta. Catalina 1522",
-      "customerDni":"23000232",
-      "customerTelephone":"4820493276",
-      "customerLongitude":-58.4228897,
-      "customerLatitude":-34.6543561,
-      "customerDistrict":"Nueva Pompeya",
-      "customerProvince":"Ciudad de Buenos Aires",
-      "productName":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full",
-      "productCategory":null,
-      "productId":"94TO8020I",
-      "productWeight":"",
-      "productWidth":18.01,
-      "productHeight":16.03,
-      "productLength":39.37,
-      "productStackability":false,
-      "productFragility":false,
-      "searchField":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full,94TO8020I,Nueva Pompeya,Ciudad de Buenos Aires",
-      "checkedForPlanning":true
-   },
-   {
-    "key":"7",
-    "deliveryid":1000052,
-    "status":"Pendiente de planificar",
-    "customerName":"Joaquín",
-    "customerSurname":"Perez",
-    "customerAddress":"Nogoyá 3132",
-    "customerDni":"27045921",
-    "customerTelephone":"5408152148",
-    "customerLongitude":-58.4927018,
-    "customerLatitude":-34.6039772,
-    "customerDistrict":"Villa del Parque",
-    "customerProvince":"Ciudad de Buenos Aires",
-    "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-    "productCategory":"TV",
-    "productId":"502158",
-    "productWeight":20.9,
-    "productWidth":144.9,
-    "productHeight":9.6,
-    "productLength":28.2,
-    "productStackability":false,
-    "productFragility":false,
-    "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-    "checkedForPlanning":true
-  },
-  {
-    "key":"8",
-    "deliveryid":1000052,
-    "status":"Pendiente de planificar",
-    "customerName":"Joaquín",
-    "customerSurname":"Perez",
-    "customerAddress":"Nogoyá 3132",
-    "customerDni":"27045921",
-    "customerTelephone":"5408152148",
-    "customerLongitude":-58.4927018,
-    "customerLatitude":-34.6039772,
-    "customerDistrict":"Villa del Parque",
-    "customerProvince":"Ciudad de Buenos Aires",
-    "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-    "productCategory":"TV",
-    "productId":"502158",
-    "productWeight":20.9,
-    "productWidth":144.9,
-    "productHeight":9.6,
-    "productLength":28.2,
-    "productStackability":false,
-    "productFragility":false,
-    "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-    "checkedForPlanning":true
-  }
-  ],
-  "trucksInfo":[
-     {
-        "key":"0",
-        "licensePlate":"AB123CD",
-        "truckDescription":"CAMIONAZO FDA$@",
-        "width":280,
-        "length":500,
-        "height":240,
-        "maximumWeightCapacity":3000,
-        "searchField":"undefined,AB123CD",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"1",
-        "licensePlate":"AS432FS",
-        "truckDescription":"CAMIONAZO FDA$@",
-        "width":270,
-        "length":480,
-        "height":250,
-        "maximumWeightCapacity":2800,
-        "searchField":"undefined,AS432FS",
-        "checkedForPlanning":false
-     }
-  ]
-}
+import DatePicker from 'react-native-date-picker';
+import { Icon } from '@rneui/themed';
 
 function TruckLoadScreen() {
   
+  const [date, setDate] = useState(new Date());
+  const [openDatePicker, setOpenDatePicker] = useState(false)
   const [camera, setCamera] = useState(null);
   const [plan, setPlan] = useState();
   const [deliveries, setDeliveries] = useState();
@@ -277,16 +22,19 @@ function TruckLoadScreen() {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
 
+  async function handleModalConfirm() {
+    setIsModalVisible(() => !isModalVisible);
+    let response = await updatePlanStatus([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''), 'Cargado');
+  }
+
   useEffect(() => {
-    startPlanning();
+    getPlanData();
   }, []);
 
-  async function startPlanning() {
+  async function getPlanData() {
     try {
-      console.log("Llegue0")
-      let response = await planningAlgorithm(planningData);
+      let response = await getPlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''));
       setPlan(response);
-      console.log("Llegue1");
     } catch (error) {
       console.log(error)
     }
@@ -300,11 +48,15 @@ function TruckLoadScreen() {
     console.log(arr);
   }
 
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
+
   uiCheckPressHandler
   function uiCheckPressHandler(item) {
     let newDeliveries = [...deliveries];
     for(const key in deliveries) {
-      if(item.key == newDeliveries[key].key) {
+      if(item.keyNumber == newDeliveries[key].keyNumber) {
         newDeliveries[key].uiCheck = !item.uiCheck
       }
     }
@@ -365,7 +117,7 @@ function TruckLoadScreen() {
     <OrbitControlsView style={{width: 290, height: 290}} camera={camera}>
       <GLView 
         onContextCreate={gl => {
-          onContextCreate(gl, {item}, item.key-1);
+          onContextCreate(gl, {item}, item.keyNumber-1);
         }}
         style={{width: 290, height: 290, borderRadius: 80}}
       />
@@ -475,7 +227,34 @@ function TruckLoadScreen() {
   }
   
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, alignItems: 'center'}}>
+      <View style={styles.dateContainer}>
+        <Text style={styles.dateText}>
+          Fecha de envío: {[padTo2Digits(date.getDate()), padTo2Digits(date.getMonth() + 1), date.getFullYear(),].join('/')}
+        </Text>
+        <Icon
+          name='calendar'
+          type='material-community'
+          style={styles.dateIcon}
+          size={30}
+          color='grey'
+          onPress={() => setOpenDatePicker(true)}
+        />
+        <DatePicker
+          modal
+          open={openDatePicker}
+          mode="date"
+          date={date}
+          onConfirm={(date) => {
+            setOpenDatePicker(false)
+            setDate(date)
+            getPlanData()
+          }}
+          onCancel={() => {
+            setOpenDatePicker(false)
+          }}
+        />
+      </View>
       <View style={{flex: 0.7}}>
         <View style={{flex: 1, flexDirection: 'row'}}>
           <View>
@@ -508,7 +287,7 @@ function TruckLoadScreen() {
           style={{flex: 1, marginBottom: 20, backgroundColor: 'white'}}
         />
         
-        <Button style={{height: 100}} title="Hide modal" onPress={handleModal}>
+        <Button style={{height: 100}} title="Hide modal" onPress={handleModalConfirm}>
           Confirmar
         </Button>
         <Modal isVisible={isModalVisible}>
@@ -562,6 +341,27 @@ const styles = StyleSheet.create({
   },
   volumeText: {
     textAlign: 'right',
+  },
+  dateIcon: {
+    marginLeft: 10,
+  },
+  dateText: {
+    fontSize: 17,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    width: '90%',
+    borderRadius: 20,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 15,
+    shadowColor: 'black',
+    shadowOpacity: 0.75,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
   },
 })
 

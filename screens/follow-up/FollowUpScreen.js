@@ -1,273 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView, FlatList, ImageEditor } from 'react-native';
-import { planningAlgorithm } from '../../util/http';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView, FlatList } from 'react-native';
+import { getPlan, updatePlanStatus } from '../../util/http';
 import { CheckBox } from '@rneui/themed';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { GOOGLE_API_KEY } from '../../environment'; 
-
-const planningData = {
-  "originLatitude": -34.66733,
-  "originLongitude": -58.4397737,
-  "originDescription": "Centro de Ditribución X S.A.",
-  "deliveriesInfo":[
-     {
-        "key":"0",
-        "deliveryid":1000000,
-        "status":"Pendiente de planificar",
-        "customerName":"Martin",
-        "customerSurname":"Sarubbi",
-        "customerAddress":"Serrano 557",
-        "customerDni":"33944674",
-        "customerTelephone":"2719414137",
-        "customerLongitude":-58.4491481,
-        "customerLatitude":-34.5977777,
-        "customerDistrict":"Villa Crespo",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Aire Acondicionado Split Candy CY3400FC - 3000F",
-        "productCategory":"Heladera",
-        "productId":"160841",
-        "productWeight":130,
-        "productWidth":91.2,
-        "productHeight":179,
-        "productLength":73.8,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Aire Acondicionado Split Candy CY3400FC - 3000F,160841,Villa Crespo,Ciudad de Buenos Aires",
-        "checkedForPlanning":true,
-        "initialLatitude": -34.5977777,
-        "initialLongitude": -58.4491481
-     },
-     {
-        "key":"1",
-        "deliveryid":1000001,
-        "status":"Pendiente de planificar",
-        "customerName":"Juan",
-        "customerSurname":"Rodriguez",
-        "customerAddress":"Medina 631",
-        "customerDni":"34304059",
-        "customerTelephone":"3435620199",
-        "customerLongitude":-58.4847839,
-        "customerLatitude":-34.6427886,
-        "customerDistrict":"Parque Avellaneda",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Freezer Gafa Eternity L290 AB 285Lt",
-        "productCategory":"Heladera",
-        "productId":"161088",
-        "productWeight":47,
-        "productWidth":61.4,
-        "productHeight":142.7,
-        "productLength":62.1,
-        "productStackability":true,
-        "productFragility":false,
-        "searchField":"Freezer Gafa Eternity L290 AB 285Lt,161088,Parque Avellaneda,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"2",
-        "deliveryid":1000002,
-        "status":"Pendiente de planificar",
-        "customerName":"Joaquín",
-        "customerSurname":"Perez",
-        "customerAddress":"Nogoyá 3132",
-        "customerDni":"27045921",
-        "customerTelephone":"5408152148",
-        "customerLongitude":-58.4927018,
-        "customerLatitude":-34.6039772,
-        "customerDistrict":"Villa del Parque",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-        "productCategory":"TV",
-        "productId":"502158",
-        "productWeight":20.9,
-        "productWidth":144.9,
-        "productHeight":9.6,
-        "productLength":28.2,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"3",
-        "deliveryid":1000005,
-        "status":"Pendiente de planificar",
-        "customerName":"Pablo",
-        "customerSurname":"Gonzalez",
-        "customerAddress":"Sta. Magdalena 377",
-        "customerDni":"15673490",
-        "customerTelephone":"7387098113",
-        "customerLongitude":-58.3834447,
-        "customerLatitude":-34.6471401,
-        "customerDistrict":"Barracas",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Panel De Tv 128 Tabaco",
-        "productCategory":"Mueble",
-        "productId":"1490453",
-        "productWeight":39,
-        "productWidth":138,
-        "productHeight":12,
-        "productLength":47,
-        "productStackability":true,
-        "productFragility":false,
-        "searchField":"Panel De Tv 128 Tabaco,1490453,Barracas,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"4",
-        "deliveryid":1000006,
-        "status":"Pendiente de planificar",
-        "customerName":"Martin",
-        "customerSurname":"Sarubbi",
-        "customerAddress":"Serrano 557",
-        "customerDni":"33944674",
-        "customerTelephone":"2719414137",
-        "customerLongitude":-58.4491481,
-        "customerLatitude":-34.5977777,
-        "customerDistrict":"Villa Crespo",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Aire Acondicionado Split Candy CY3400FC - 3000F",
-        "productCategory":"Heladera",
-        "productId":"160841",
-        "productWeight":130,
-        "productWidth":91.2,
-        "productHeight":179,
-        "productLength":73.8,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Aire Acondicionado Split Candy CY3400FC - 3000F,160841,Villa Crespo,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"5",
-        "deliveryid":1000036,
-        "status":"Pendiente de planificar",
-        "customerName":"Olivia",
-        "customerSurname":"Candia",
-        "customerAddress":"Sta. Catalina 1522",
-        "customerDni":"23000232",
-        "customerTelephone":"4820493276",
-        "customerLongitude":-58.4228897,
-        "customerLatitude":-34.6543561,
-        "customerDistrict":"Nueva Pompeya",
-        "customerProvince":"Ciudad de Buenos Aires",
-        "productName":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full",
-        "productCategory":null,
-        "productId":"94TO8020I",
-        "productWeight":"",
-        "productWidth":18.01,
-        "productHeight":16.03,
-        "productLength":39.37,
-        "productStackability":false,
-        "productFragility":false,
-        "searchField":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full,94TO8020I,Nueva Pompeya,Ciudad de Buenos Aires",
-        "checkedForPlanning":true
-     },
-     {
-      "key":"6",
-      "deliveryid":1000037,
-      "status":"Pendiente de planificar",
-      "customerName":"Olivia",
-      "customerSurname":"Candia",
-      "customerAddress":"Sta. Catalina 1522",
-      "customerDni":"23000232",
-      "customerTelephone":"4820493276",
-      "customerLongitude":-58.4228897,
-      "customerLatitude":-34.6543561,
-      "customerDistrict":"Nueva Pompeya",
-      "customerProvince":"Ciudad de Buenos Aires",
-      "productName":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full",
-      "productCategory":null,
-      "productId":"94TO8020I",
-      "productWeight":"",
-      "productWidth":18.01,
-      "productHeight":16.03,
-      "productLength":39.37,
-      "productStackability":false,
-      "productFragility":false,
-      "searchField":"Tostadora Eléctrica Atma To8020i 700w 7 Niveles Full,94TO8020I,Nueva Pompeya,Ciudad de Buenos Aires",
-      "checkedForPlanning":true
-   },
-   {
-    "key":"7",
-    "deliveryid":1000052,
-    "status":"Pendiente de planificar",
-    "customerName":"Joaquín",
-    "customerSurname":"Perez",
-    "customerAddress":"Nogoyá 3132",
-    "customerDni":"27045921",
-    "customerTelephone":"5408152148",
-    "customerLongitude":-58.4927018,
-    "customerLatitude":-34.6039772,
-    "customerDistrict":"Villa del Parque",
-    "customerProvince":"Ciudad de Buenos Aires",
-    "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-    "productCategory":"TV",
-    "productId":"502158",
-    "productWeight":20.9,
-    "productWidth":144.9,
-    "productHeight":9.6,
-    "productLength":28.2,
-    "productStackability":false,
-    "productFragility":false,
-    "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-    "checkedForPlanning":true
-  },
-  {
-    "key":"8",
-    "deliveryid":1000052,
-    "status":"Pendiente de planificar",
-    "customerName":"Joaquín",
-    "customerSurname":"Perez",
-    "customerAddress":"Nogoyá 3132",
-    "customerDni":"27045921",
-    "customerTelephone":"5408152148",
-    "customerLongitude":-58.4927018,
-    "customerLatitude":-34.6039772,
-    "customerDistrict":"Villa del Parque",
-    "customerProvince":"Ciudad de Buenos Aires",
-    "productName":"Smart TV 4K UHD Samsung 65\" UN65AU7000",
-    "productCategory":"TV",
-    "productId":"502158",
-    "productWeight":20.9,
-    "productWidth":144.9,
-    "productHeight":9.6,
-    "productLength":28.2,
-    "productStackability":false,
-    "productFragility":false,
-    "searchField":"Smart TV 4K UHD Samsung 65\" UN65AU7000,502158,Villa del Parque,Ciudad de Buenos Aires",
-    "checkedForPlanning":true
-  }
-  ],
-  "trucksInfo":[
-     {
-        "key":"0",
-        "licensePlate":"AB123CD",
-        "truckDescription":"CAMIONAZO FDA$@",
-        "width":280,
-        "length":500,
-        "height":240,
-        "maximumWeightCapacity":3000,
-        "searchField":"undefined,AB123CD",
-        "checkedForPlanning":true
-     },
-     {
-        "key":"1",
-        "licensePlate":"AS432FS",
-        "truckDescription":"CAMIONAZO FDA$@",
-        "width":270,
-        "length":480,
-        "height":250,
-        "maximumWeightCapacity":2800,
-        "searchField":"undefined,AS432FS",
-        "checkedForPlanning":false
-     }
-  ]
-}
-
+import Button from '../../components/Button';
+import Modal from 'react-native-modal';
+import DatePicker from 'react-native-date-picker';
+import { Icon } from '@rneui/themed';
 
 function FollowUpScreen() {
   
+  const [date, setDate] = useState(new Date());
+  const [openDatePicker, setOpenDatePicker] = useState(false)
   const [plan, setPlan] = useState();
   const [deliveries, setDeliveries] = useState();
   const [truck, setTruck] = useState();
@@ -281,11 +27,27 @@ function FollowUpScreen() {
     latitudeDelta: 0.1822,
     longitudeDelta: 0.0421,
   })
+  const [destinationLocation, setDestinationLocation] = useState({});
+
   const [waypoints, setWaypoints] = useState([{}]);
   const [planningMarkers, setPlanningMarkers] = useState([{}]);
   const [loaded, setLoaded] = useState(false);
   const [markers, setMarkers] = useState([{ coordinates: { latitude: 37.78383, longitude: -122.405766 } }]);
+
+  const [isCheckbox1, setIsCheckbox1] = React.useState(false);
+  const handleCheckbox1 = () => setIsCheckbox1(() => {setIsCheckbox1(true); setIsCheckbox2(false); setIsCheckbox3(false); setIsCheckbox4(false)});
+  const [isCheckbox2, setIsCheckbox2] = React.useState(false);
+  const handleCheckbox2 = () => setIsCheckbox2(() => {setIsCheckbox1(false); setIsCheckbox2(true); setIsCheckbox3(false); setIsCheckbox4(false)});
+  const [isCheckbox3, setIsCheckbox3] = React.useState(false);
+  const handleCheckbox3 = () => setIsCheckbox3(() => {setIsCheckbox1(false); setIsCheckbox2(false); setIsCheckbox3(true); setIsCheckbox4(false)});
+  const [isCheckbox4, setIsCheckbox4] = React.useState(false);
+  const handleCheckbox4 = () => setIsCheckbox4(() => {setIsCheckbox1(false); setIsCheckbox2(false); setIsCheckbox3(false); setIsCheckbox4(true)});
   
+  async function handleModalConfirm() {
+    setIsModalVisible(() => !isModalVisible);
+    let response = await updatePlanStatus([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''), 'Finalizado');
+  }
+
   const renderTrucklItem = ({item}) => (
     <View style={{flex: 1, backgroundColor: 'white', width: 80, height: 100, flexDirection: 'column', alignItems:'center', padding: 10, margin: 10, borderRadius: 10, shadowColor: 'black', shadowOpacity: 1}}>
       <Pressable
@@ -307,13 +69,17 @@ function FollowUpScreen() {
 
 
   useEffect(() => {
-    startPlanning();
+    getPlanData();
   }, []);
 
-  async function startPlanning() {
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
+
+
+  async function getPlanData() {
     try {
-      console.log("Llegue0")
-      let response = await planningAlgorithm(planningData);
+      let response = await getPlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''));
       setPlan(response);
       if(response[0] !== undefined) {
         const coordinatesObj = {
@@ -330,6 +96,10 @@ function FollowUpScreen() {
           latitude: response[0].initialLatitude,
         })
         setOriginalOriginLocation({
+          longitude: response[0].initialLongitude,
+          latitude: response[0].initialLatitude,
+        })
+        setDestinationLocation({
           longitude: response[0].initialLongitude,
           latitude: response[0].initialLatitude,
         })
@@ -377,7 +147,11 @@ function FollowUpScreen() {
       latitude: item.orderedDelivery.delivery.customer.latitude,
       longitude: item.orderedDelivery.delivery.customer.longitude,
     }
-    console.log(coordinate)
+    let coordinate2 = {
+      latitude: (parseFloat(item.orderedDelivery.delivery.customer.latitude) + 0.0001).toFixed(6),
+      longitude: (parseFloat(item.orderedDelivery.delivery.customer.longitude) + 0.0001).toFixed(6)
+    }
+
     waypointsArray.push(coordinate);
 
     for(let i = 0; i < deliveries.length; i++) {
@@ -392,12 +166,14 @@ function FollowUpScreen() {
       )
     }
 
-    setWaypoints(waypointsArray)
+    setWaypoints(waypointsArray);
+    setDestinationLocation(coordinate2);
 
   }
 
   console.log(waypoints)
   console.log(originLocation)
+  console.log(destinationLocation)
 
 
   function uiCheckPressHandler(item) {
@@ -408,6 +184,12 @@ function FollowUpScreen() {
       }
     }
     setDeliveries(newDeliveries);
+    setIsModalVisible(true);
+  }
+
+  function deliveredPressHandler(reason) {
+    
+
   }
 
   const renderDeliveryItem = ({item}) => (
@@ -442,7 +224,34 @@ function FollowUpScreen() {
   )
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, alignItems: 'center'}}>
+      <View style={styles.dateContainer}>
+        <Text style={styles.dateText}>
+          Fecha de envío: {[padTo2Digits(date.getDate()), padTo2Digits(date.getMonth() + 1), date.getFullYear(),].join('/')}
+        </Text>
+        <Icon
+          name='calendar'
+          type='material-community'
+          style={styles.dateIcon}
+          size={30}
+          color='grey'
+          onPress={() => setOpenDatePicker(true)}
+        />
+        <DatePicker
+          modal
+          open={openDatePicker}
+          mode="date"
+          date={date}
+          onConfirm={(date) => {
+            setOpenDatePicker(false)
+            setDate(date)
+            getPlanData()
+          }}
+          onCancel={() => {
+            setOpenDatePicker(false)
+          }}
+        />
+      </View>
       <View style={{flex: 0.7}}>
         <View style={{flex: 1, flexDirection: 'row'}}>
           <View>
@@ -477,7 +286,7 @@ function FollowUpScreen() {
               <MapViewDirections
                 origin={originLocation}
                 waypoints={waypoints}
-                destination={originLocation}
+                destination={destinationLocation}
                 apikey={GOOGLE_API_KEY}
                 strokeWidth={3}
                 strokeColor="blue"
@@ -498,6 +307,76 @@ function FollowUpScreen() {
           style={{flex: 1, marginBottom: 20, backgroundColor: 'white'}}
         />
       </View>
+      <Modal isVisible={isModalVisible}>
+        <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center', marginTop: 200, marginBottom: 200, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
+          <Text style={{fontSize: 15}}>Indique si ha entregado el producto.</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', alignContent: 'flex-start'}}>
+            <View style={{}}>
+              <CheckBox
+                accessibilityRole='button'
+                center
+                uncheckedIcon="circle-o"
+                checkedIcon="dot-circle-o"
+                checked={isCheckbox1}
+                onPress={handleCheckbox1}
+              />
+            </View>
+            <View style={{}}>
+              <Text style={styles.productText}>Se ha entregado el producto.                          </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{}}>
+              <CheckBox
+                accessibilityRole='button'
+                center
+                uncheckedIcon="circle-o"
+                checkedIcon="dot-circle-o"
+                checked={isCheckbox2}
+                onPress={handleCheckbox2}
+              />
+            </View>
+            <View style={{}}>
+              <Text style={styles.productText}>Se ha entregado el producto roto.                 </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{}}>
+              <CheckBox
+                accessibilityRole='button'
+                center
+                uncheckedIcon="circle-o"
+                checkedIcon="dot-circle-o"
+                checked={isCheckbox3}
+                onPress={handleCheckbox3}
+              />
+            </View>
+            <View style={{}}>
+              <Text style={styles.productText}>No se ha entregado el producto porque el cliente no estaba.</Text>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{}}>
+              <CheckBox
+                accessibilityRole='button'
+                center
+                uncheckedIcon="circle-o"
+                checkedIcon="dot-circle-o"
+                checked={isCheckbox4}
+                onPress={handleCheckbox4}
+              />
+            </View>
+            <View style={{}}>
+              <Text style={styles.productText}>No se entregó el producto ya que estaba dañado.</Text>
+            </View>
+          </View>
+          
+          <Button title="Hide modal" onPress={handleModal} style={{marginTop: 10}}>
+            OK
+          </Button>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -549,6 +428,27 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     borderRadios: 30
+  },
+  dateIcon: {
+    marginLeft: 10,
+  },
+  dateText: {
+    fontSize: 17,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    width: '90%',
+    borderRadius: 20,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 15,
+    shadowColor: 'black',
+    shadowOpacity: 0.75,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
   },
 })
 

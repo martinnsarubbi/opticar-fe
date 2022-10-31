@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image, FlatList, Alert } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Icon, Tooltip } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker';
-import { fetchDeliveries, fetchTrucks, planningAlgorithm } from '../../util/http';
+import { fetchDeliveries, fetchTrucks, planningAlgorithm, savePlan, getPlan, deletePlan } from '../../util/http';
 import Button from '../../components/Button';
 import CancelButton from '../../components/CancelButton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -53,11 +53,25 @@ function PlanningScreen({ navigation, route }) {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
   const [isPlanningModalVisible, setIsPlanningModalVisible] = React.useState(false);
-  const handlePlanningModal = () => setIsPlanningModalVisible(() => !isPlanningModalVisible);
+  async function handlePlanningModal () {
+    setIsPlanningModalVisible(() => !isPlanningModalVisible);
+    try {
+      let response = await deletePlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''))
+      Alert.alert('El plan ' + [date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('') + ' se ha eliminado.')
+      setPlan();
+      setMarkers([{}]);
+      setPlanningMarkers([{}]);
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const [isOkPlanningModalVisible, setIsOkPlanningModalVisible] = React.useState(false);
-  const handleOkPlanningModal = () => (setIsOkPlanningModalVisible(() => !isOkPlanningModalVisible)) //TODO: agregar 
   const handleConfirmationPlanningModal = () => (setIsPlanningModalVisible(() => !isPlanningModalVisible), setIsOkPlanningModalVisible(() => !isOkPlanningModalVisible))
 
+  function handleOkPlanningModal(){
+    setIsOkPlanningModalVisible(() => !isOkPlanningModalVisible);
+    response = savePlan(plan, originLocation);
+  }
   function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
   }
@@ -211,20 +225,49 @@ function PlanningScreen({ navigation, route }) {
   }
 
   async function startPlanning() {
+    if(truckCount == 0) {
+      Alert.alert('No ha seleccionado ningún transporte.');
+      return;
+    }
+    if(deliveryCount == 0) {
+      Alert.alert('No ha seleccionado ninguna entrega.');
+      return;
+    }
+    if(originLocation.latitude == -34.604593 && originLocation.longitude == -58.42888) {
+      Alert.alert('No ha seleccionado ningún punto de origen.');
+      return;
+    }
     try {
       const planningData = {
         deliveriesInfo: deliveries,
         trucksInfo: trucks,
         originLatitude: inputValues.latitude,
         originLongitude: inputValues.longitude,
-        originDescription: inputValues.address
+        originDescription: inputValues.address,
+        planDate: [date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('')
       }
       let response = await planningAlgorithm(planningData);
       setPlan(response);
       setIsPlanningModalVisible(true);
-      console.log(plan)
-    } catch (error) {
-      console.log(error)
+      //setTimeout(() => {
+      //    setPlan(response);
+      //    setIsPlanningModalVisible(true);
+      //}, 5000);
+    } catch (message) {
+      Alert.alert("Ya existe un plan", "El id es " + [date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''),
+        [{
+          text: "Ver plan",
+          onPress: async () => {
+            try {
+              let response = await getPlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''));
+              setPlan(response);
+              setIsPlanningModalVisible(true);
+            } catch(error) { 
+              Alert.alert(error);
+            }
+          },
+        }]
+      )
     }
   }
 
@@ -241,7 +284,7 @@ function PlanningScreen({ navigation, route }) {
           />
         </View>
         <View style={{flex: 1}}>
-          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.key}</Text>
+          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.keyNumber}</Text>
         </View>
       </Pressable>
     </View>
@@ -560,11 +603,11 @@ function PlanningScreen({ navigation, route }) {
               Aceptar
             </Button>
             <CancelButton title="Hide modal" onPress={handlePlanningModal}>
-              Cancelar
+              Eliminar
             </CancelButton>
             <Modal isVisible={isOkPlanningModalVisible}>
-              <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center', marginTop: 200, marginBottom: 450, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
-                <Text style={{fontSize: 15}}>Se han planificado las entregas. Ya se pueden cargar al transporte.</Text>
+              <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center', marginTop: 200, marginBottom: 410, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
+                <Text style={{fontSize: 15}}>Se han planificado las entregas en el plan numero {[date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('')}. Ya se pueden cargar al transporte.</Text>
                 <Button title="Hide modal" onPress={handleConfirmationPlanningModal} style={{marginTop: 10}}>
                   OK
                 </Button>
