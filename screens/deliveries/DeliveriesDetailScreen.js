@@ -29,6 +29,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
     productRotability: (props.route.params.itemData.productRotability === 'Si') ? true: false,
     deliveryid: props.route.params.itemData.deliveryid,
     status: props.route.params.itemData.status,
+    deliveryDate: props.route.params.itemData.deliveryDate,
     latitudeDelta: 0.0059,
     longitudeDelta: 0.0059,
   });
@@ -167,6 +168,17 @@ function DeliveriesDetailScreen(props, { navigation }) {
               value: marker.customerDepartment
             }}
             style={styles.allInputRow}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='Fecha de entrega'
+            placeholder='dd/mm/yyyy'
+            style={styles.allInputRow}
+            textInputConfig={{
+              editable: false,
+              value: marker.deliveryDate
+            }}
           />
         </View>
         <View style={styles.titleContainer}>

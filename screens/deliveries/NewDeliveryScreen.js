@@ -235,23 +235,23 @@ function NewDeliveryScreen({ navigation }) {
         </View>
         <View style={styles.inputRow}>
           <Input
-            label='Piso/Departamento'
-            placeholder='Ingrese piso y/o departamento'
-            style={styles.allInputRow}
-            textInputConfig={{
-              onChangeText: inputChangedHandler.bind(this, 'department'),
-              value: inputValues.department
-            }}
-          />
-        </View>
-        <View style={styles.inputRow}>
-          <Input
             label='Provincia'
             placeholder='Provincia'
             style={styles.allInputRow}
             textInputConfig={{
               onChangeText: inputChangedHandler.bind(this, 'province'),
               value: inputValues.province
+            }}
+          />
+        </View>
+        <View style={styles.inputRow}>
+          <Input
+            label='Piso/Departamento'
+            placeholder='Ingrese piso y/o departamento'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'department'),
+              value: inputValues.department
             }}
           />
         </View>
