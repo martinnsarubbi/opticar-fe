@@ -102,6 +102,7 @@ function PlanningScreen({ navigation, route }) {
       let deliveriesList = null;
       if (!deliveriesFetched) {
         deliveriesList = await fetchDeliveries(true, false);
+        console.log(deliveriesList);
         setDeliveriesFetched(true)
       } else {
         deliveriesList = input;

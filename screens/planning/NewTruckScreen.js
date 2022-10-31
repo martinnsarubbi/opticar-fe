@@ -23,6 +23,9 @@ function NewTruckScreen({ navigation }) {
     maximumWeightCapacity: '',
     height: '',
     length: '',
+    driverName: '',
+    driverSurname: '',
+    dni: ''
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
@@ -68,7 +71,7 @@ function NewTruckScreen({ navigation }) {
         />
       </View>
 
-      <View style={styles.titleContainer}>
+        <View style={styles.titleContainer}>
           <Text style={styles.sectionTitle}>Datos del furgón</Text>
         </View>
 
@@ -109,6 +112,42 @@ function NewTruckScreen({ navigation }) {
             textInputConfig={{
               onChangeText: inputChangedHandler.bind(this, 'maximumWeightCapacity'),
               value: inputValues.maximumWeightCapacity
+            }}
+          />
+        </View>
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.sectionTitle}>Datos del chofer</Text>
+        </View>
+
+        <View style={styles.halfInputRow}>
+          <Input
+            label='Nombre'
+            placeholder='Nombre'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'driverName'),
+              value: inputValues.driverName
+            }}
+          />
+          <Input
+            label='Apellido'
+            placeholder='Apellido'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'driverSurname'),
+              value: inputValues.driverSurname
+            }}
+          />
+        </View>
+        <View style={styles.halfInputRow}>
+          <Input
+            label='DNI'
+            placeholder='DNI'
+            style={styles.allInputRow}
+            textInputConfig={{
+              onChangeText: inputChangedHandler.bind(this, 'dni'),
+              value: inputValues.dni
             }}
           />
         </View>

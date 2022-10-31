@@ -41,6 +41,7 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
     const deliveryObj = {
       key: key,
       deliveryid: response.data[key].id,
+      deliveryDate: response.data[key].deliveryDate,
       status: response.data[key].status,
       customerName: response.data[key].customer.name,
       customerSurname: response.data[key].customer.surname,
@@ -111,6 +112,7 @@ export async function fetchTrucks() {
 export async function planningAlgorithm(planningInfo) {
   let url = BACKEND_URL + '/api/planning-algorithm';
   const response = await axios.post(url, planningInfo);
+  console.log(response.toString());
   return response.data;
 }
 
@@ -143,6 +145,13 @@ export async function deletePlan(planDate) {
 
 export async function updatePlanStatus(planDate, newStatus) {
   let url = BACKEND_URL + '/api/planning/' + planDate + '/' + newStatus;
+  const response = await axios.put(url);
+  return response.data;
+}
+
+export async function addToMLTable(delivery, reason) {
+  console.log('dededede:' + delivery.toString())
+  let url = BACKEND_URL + '/api/delivery/' + delivery + '/' + reason;
   const response = await axios.put(url);
   return response.data;
 }

@@ -125,6 +125,7 @@ function NewDeliveryScreen({ navigation }) {
   }
 
   async function submitHandler() {
+    console.log(inputValues)
     const id = await storeDelivery(inputValues);
     navigation.navigate('Entregas');
   }

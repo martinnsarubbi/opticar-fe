@@ -21,6 +21,7 @@ function TruckLoadScreen() {
   const [truck, setTruck] = useState();
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
+  const [counter, setCounter] = useState(10);
 
   async function handleModalConfirm() {
     setIsModalVisible(() => !isModalVisible);
@@ -28,11 +29,16 @@ function TruckLoadScreen() {
   }
 
   useEffect(() => {
-    getPlanData();
+    getPlanData(date);
   }, []);
 
-  async function getPlanData() {
+  useEffect(() => {
+    renderView;
+  }, [deliveries]);
+
+  async function getPlanData(date) {
     try {
+      console.log(date);
       let response = await getPlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''));
       setPlan(response);
     } catch (error) {
@@ -45,14 +51,13 @@ function TruckLoadScreen() {
     var arr = []
     arr.push(trip)
     setTruck(arr)
-    console.log(arr);
+    console.log(truck);
   }
 
   function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
   }
 
-  uiCheckPressHandler
   function uiCheckPressHandler(item) {
     let newDeliveries = [...deliveries];
     for(const key in deliveries) {
@@ -61,6 +66,10 @@ function TruckLoadScreen() {
       }
     }
     setDeliveries(newDeliveries);
+    setCounter(counter + 1);
+    let newTruck = [...truck];
+    newTruck[0].keyNumber = counter;
+    setTruck(newTruck)
   }
 
   const renderTrucklItem = ({item}) => (
@@ -76,7 +85,7 @@ function TruckLoadScreen() {
           />
         </View>
         <View style={{flex: 1}}>
-          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.key}</Text>
+          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.tripNumber}</Text>
         </View>
       </Pressable>
     </View>
@@ -95,6 +104,7 @@ function TruckLoadScreen() {
         },
         styles.rowContainer
       ]}
+      onPress={() => { uiCheckPressHandler(item) }}
     >
       <View style={styles.rowLeft}>
         <CheckBox
@@ -126,6 +136,7 @@ function TruckLoadScreen() {
   )
   
   function onContextCreate(gl, plan, tripNumber) {
+    console.log('llegue1');
     var x = plan.item
     console.log("tripNumber: " + tripNumber)
     console.log("x:" + x)
@@ -165,20 +176,23 @@ function TruckLoadScreen() {
     camera.lookAt(-1,-1,-1)
 
     for(var i = 0; i < x.load.length; i++) {
-      const geometry = new BoxGeometry(x.load[i].width/divisor,x.load[i].height/divisor,x.load[i].length/divisor)
-      const material = new MeshStandardMaterial({color: 'white', metalness: 1, roughness: 1})
-      material.visible = true;
-      const cube = new Mesh(geometry,material)
-      cube.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
-      cube.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
-      cube.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
-      scene.add(cube)
-      const edges = new THREE.EdgesGeometry( geometry );
-      const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 'black' } ) );
-      line.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
-      line.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
-      line.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
-      scene.add( line );
+      console.log(x.load[i].uiCheck === true)
+      if(x.load[i].uiCheck === true) {
+        const geometry = new BoxGeometry(x.load[i].width/divisor,x.load[i].height/divisor,x.load[i].length/divisor)
+        const material = new MeshStandardMaterial({color: 'white', metalness: 1, roughness: 1})
+        material.visible = true;
+        const cube = new Mesh(geometry,material)
+        cube.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
+        cube.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
+        cube.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
+        scene.add(cube)
+        const edges = new THREE.EdgesGeometry( geometry );
+        const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 'black' } ) );
+        line.position.x = - x.truck.width/divisor / 2 + x.load[i].position.c1.axisX/divisor + x.load[i].width/divisor / 2
+        line.position.y = - x.truck.height/divisor / 2 + x.load[i].position.c1.axisZ/divisor + x.load[i].height/divisor / 2
+        line.position.z = - x.truck.length/divisor / 2 + x.load[i].position.c1.axisY/divisor + x.load[i].length/divisor / 2
+        scene.add( line );
+      }
     }
 
     const lights = []; // Storage for lights
@@ -246,9 +260,11 @@ function TruckLoadScreen() {
           mode="date"
           date={date}
           onConfirm={(date) => {
+            console.log('Llegueesee')
             setOpenDatePicker(false)
             setDate(date)
-            getPlanData()
+            console.log('Llegue1111')
+            getPlanData(date)
           }}
           onCancel={() => {
             setOpenDatePicker(false)
@@ -263,7 +279,7 @@ function TruckLoadScreen() {
               renderItem={renderView}
               scrollEnabled={false}
               extraData={truck}
-              keyExtractor={item => item.key}
+              keyExtractor={item => item.keyNumber}
               style={{flex: 1, marginBottom: 20, backgroundColor: 'white', width: '100%'}}
             />
           </View>
@@ -272,7 +288,7 @@ function TruckLoadScreen() {
               data={plan}
               renderItem={renderTrucklItem}
               extraData={plan}
-              keyExtractor={item => item.key}
+              keyExtractor={item => item.keyNumber}
               style={{flex: 1, height: 300, width: 100}}
             />
           </View>

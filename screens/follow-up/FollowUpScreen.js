@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, Image, ScrollView, FlatList } from 'react-native';
-import { getPlan, updatePlanStatus } from '../../util/http';
+import { getPlan, updatePlanStatus, addToMLTable } from '../../util/http';
 import { CheckBox } from '@rneui/themed';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
@@ -10,7 +10,7 @@ import Modal from 'react-native-modal';
 import DatePicker from 'react-native-date-picker';
 import { Icon } from '@rneui/themed';
 
-function FollowUpScreen() {
+function FollowUpScreen({navigation}) {
   
   const [date, setDate] = useState(new Date());
   const [openDatePicker, setOpenDatePicker] = useState(false)
@@ -21,6 +21,7 @@ function FollowUpScreen() {
   const handleModal = () => setIsModalVisible(() => !isModalVisible);
   const mapRef = useRef(null);
   const [originalOriginLocation, setOriginalOriginLocation] = useState({})
+  const [deliveryBeingUpdated, setDeliveryBeingUpdated] = useState({})
   const [originLocation, setOriginLocation] = useState({
     latitude: -34.604593,
     longitude: -58.428880,
@@ -45,7 +46,16 @@ function FollowUpScreen() {
   
   async function handleModalConfirm() {
     setIsModalVisible(() => !isModalVisible);
-    let response = await updatePlanStatus([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''), 'Finalizado');
+    //let response = await updatePlanStatus([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''), 'Finalizado');
+    //console.log(response)
+    //console.log(deliveries)
+    var reason = ''
+    if(handleCheckbox1) reason = 'Entregado OK'
+    if(handleCheckbox2) reason = 'Entregado con rotura'
+    if(handleCheckbox3) reason = 'No entregado por rotura'
+    if(handleCheckbox4) reason = 'No entregado'
+    let response2 = await addToMLTable(deliveryBeingUpdated);
+    setDeliveryBeingUpdated({});
   }
 
   const renderTrucklItem = ({item}) => (
@@ -54,14 +64,14 @@ function FollowUpScreen() {
         onPress={() => { tripPressHandler(item) }}
         style={({ pressed }) => pressed && styles.pressed}
       >
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, alignItems:'center'}}>
           <Image 
             style={{height: 40, width: 40}}
             source={require('../../assets/delivery-truck.png')}
           />
         </View>
         <View style={{flex: 1}}>
-          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.key}</Text>
+          <Text style={{flex: 1, fontSize: 17}}>Viaje {item.tripNumber}</Text>
         </View>
       </Pressable>
     </View>
@@ -69,7 +79,7 @@ function FollowUpScreen() {
 
 
   useEffect(() => {
-    getPlanData();
+    getPlanData(date);
   }, []);
 
   function padTo2Digits(num) {
@@ -77,7 +87,7 @@ function FollowUpScreen() {
   }
 
 
-  async function getPlanData() {
+  async function getPlanData(date) {
     try {
       let response = await getPlan([date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join(''));
       setPlan(response);
@@ -181,20 +191,50 @@ function FollowUpScreen() {
     for(const key in deliveries) {
       if(item.key == newDeliveries[key].key) {
         newDeliveries[key].uiCheck = !item.uiCheck
+        console.log(newDeliveries[key]);
+        setDeliveryBeingUpdated(newDeliveries[key]);
       }
     }
     setDeliveries(newDeliveries);
     setIsModalVisible(true);
   }
 
-  function deliveredPressHandler(reason) {
-    
+  function deliveriesPressHandler(item) {
+    var itemToSend = item.orderedDelivery.delivery
+    console.log(itemToSend)
+    var itemData = {
+      key: '0',
+      deliveryid: itemToSend.id,
+      deliveryDate: itemToSend.deliveryDate,
+      status: itemToSend.status,
+      customerName: itemToSend.customer.name,
+      customerSurname: itemToSend.customer.surname,
+      customerAddress: itemToSend.customer.address,
+      customerDni: itemToSend.customer.id.toString(),
+      customerTelephone: itemToSend.customer.telephone,
+      customerLongitude: itemToSend.customer.longitude,
+      customerLatitude: itemToSend.customer.latitude,
+      customerDistrict: itemToSend.customer.district,
+      customerProvince: itemToSend.customer.province,
+      customerDepartment: itemToSend.customer.department,
+      productName: itemToSend.product.productName,
+      productCategory: itemToSend.product.category,
+      productId: itemToSend.product.id,
+      productWeight: itemToSend.product.weight,
+      productWidth: itemToSend.product.width,
+      productHeight: itemToSend.product.height,
+      productLength: itemToSend.product.length,
+      productStackability: itemToSend.product.stackability,
+      productRotability: itemToSend.product.rotability,
+      productFragility: itemToSend.product.fragility,
+    }
 
+    navigation.navigate('Detalle de entrega', { itemData })
   }
 
   const renderDeliveryItem = ({item}) => (
     <Pressable
-    onPress={() => directionPressHandler(item)}
+    onPress={() => deliveriesPressHandler(item)}
       style={({ pressed }) => [
         {
           backgroundColor: pressed
@@ -215,11 +255,26 @@ function FollowUpScreen() {
         />
       </View>
       <View style={styles.rowMiddle}>
-        <Text style={styles.productText}>{item.orderedDelivery.delivery.product.productName}</Text>
+        <Text style={styles.productText}>{item.orderedDelivery.delivery.customer.address}, {item.orderedDelivery.delivery.customer.district}, {item.orderedDelivery.delivery.customer.province}</Text>
+        <Text numberOfLines={1} style={styles.locationText}>{item.orderedDelivery.delivery.product.productName}</Text>
       </View>
-      <View style={styles.rowRight}>
-        <Text style={styles.volumeText}>{(item.height * item.width * item.length / 1000000).toFixed(2)} m3</Text>
-      </View>
+      <Pressable
+      onPress={() => directionPressHandler(item)}
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed
+              ? '#e2e2e2'
+              : 'white',
+            opacity: pressed
+              ? 0.75 : 1
+          },
+          styles.rowRight
+        ]}
+      >
+        <View style={{alignItems:'center'}}>
+          <Text>Ver en mapa</Text>
+        </View>
+      </Pressable>
     </Pressable>
   )
 
@@ -245,7 +300,7 @@ function FollowUpScreen() {
           onConfirm={(date) => {
             setOpenDatePicker(false)
             setDate(date)
-            getPlanData()
+            getPlanData(date)
           }}
           onCancel={() => {
             setOpenDatePicker(false)
@@ -308,9 +363,9 @@ function FollowUpScreen() {
         />
       </View>
       <Modal isVisible={isModalVisible}>
-        <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', alignItems: 'center', marginTop: 200, marginBottom: 200, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
+        <View style={{ flex: 1, backgroundColor: 'white', flexDirection: 'column', marginTop: 200, marginBottom: 200, borderRadius: 20, paddingTop: 40, paddingHorizontal: 20 }}>
           <Text style={{fontSize: 15}}>Indique si ha entregado el producto.</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', alignContent: 'flex-start'}}>
+          <View style={{ flexDirection: 'row', alignItems: 'center'}}>
             <View style={{}}>
               <CheckBox
                 accessibilityRole='button'
@@ -321,8 +376,8 @@ function FollowUpScreen() {
                 onPress={handleCheckbox1}
               />
             </View>
-            <View style={{}}>
-              <Text style={styles.productText}>Se ha entregado el producto.                          </Text>
+            <View style={{flex:1}}>
+              <Text style={styles.productText}>Se ha entregado el producto.</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center'}}>
@@ -336,8 +391,8 @@ function FollowUpScreen() {
                 onPress={handleCheckbox2}
               />
             </View>
-            <View style={{}}>
-              <Text style={styles.productText}>Se ha entregado el producto roto.                 </Text>
+            <View style={{flex:1}}>
+              <Text style={styles.productText}>Se ha entregado el producto dañado.</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center'}}>
@@ -351,8 +406,8 @@ function FollowUpScreen() {
                 onPress={handleCheckbox3}
               />
             </View>
-            <View style={{}}>
-              <Text style={styles.productText}>No se ha entregado el producto porque el cliente no estaba.</Text>
+            <View style={{flex:1}}>
+              <Text style={styles.productText}>No se entregó el producto ya que estaba dañado.</Text>
             </View>
           </View>
 
@@ -367,12 +422,12 @@ function FollowUpScreen() {
                 onPress={handleCheckbox4}
               />
             </View>
-            <View style={{}}>
-              <Text style={styles.productText}>No se entregó el producto ya que estaba dañado.</Text>
+            <View style={{flex:1}}>
+              <Text style={styles.productText}>No se entregó el producto por otras razones (cliente no estaba, error de carga, no se llegó con el reparto, étc.)</Text>
             </View>
           </View>
           
-          <Button title="Hide modal" onPress={handleModal} style={{marginTop: 10}}>
+          <Button title="Hide modal" onPress={handleModalConfirm} style={{marginTop: 10}}>
             OK
           </Button>
         </View>
@@ -386,10 +441,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
     borderRadius: 4,
     flex: 1,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    flex: 1
   },
   rowContainer: {
     height: 60,
@@ -416,9 +467,6 @@ const styles = StyleSheet.create({
   },
   productText: {
     fontWeight: 'bold'
-  },
-  volumeText: {
-    textAlign: 'right',
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -450,6 +498,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
   },
+  viewOnMap: {
+    width: 60,
+    backgroundColor: 'red'
+  }
 })
 
 export default FollowUpScreen;
