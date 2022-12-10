@@ -19,7 +19,6 @@ function SizingScreen({ navigation, route }) {
   const [fragility, setFragility] = useState((route.params?.itemData?.productFragility) ? route.params?.itemData?.productFragility : false);
   const [stackability, setStackability] = useState((route.params?.itemData?.productStackability) ? route.params?.itemData?.productStackability : false);
   const [rotability, setRotability] = useState((route.params?.itemData?.productRotability) ? route.params?.itemData?.productRotability : false);
-  const [ocrTooltipOpen, setOcrTooltipOpen] = useState(false); 
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false); 
   const [rotableTooltipOpen, setRotableTooltipOpen] = useState(false);
@@ -55,6 +54,9 @@ function SizingScreen({ navigation, route }) {
       length: +inputValues.length,
       weight: +inputValues.weight,
       width: +inputValues.width,
+      stackability: stackability,
+      rotability: rotability,
+      fragility: fragility,
       entryDate: new Date(),
       id: inputValues.barcode
     };
@@ -67,40 +69,6 @@ function SizingScreen({ navigation, route }) {
       <View style={styles.innerContainer}>
         <View style={styles.titleContainer}>
           <Text style={styles.sectionTitle}>Ingrese las dimensiones</Text>
-          <View style={styles.ocrComponent}>
-            <Icon
-              name='ocr'
-              type='material-community'
-              size={30}
-              color='grey'
-            />
-          </View>
-          <Tooltip
-            visible={ocrTooltipOpen}
-            onOpen={() => {
-              setOcrTooltipOpen(true);
-            }}
-            onClose={() => {
-              setOcrTooltipOpen(false);
-            }}
-            width={300}
-            height={130}
-            backgroundColor='white'
-            overlayColor='#93a2b899'
-            popover={<Text>
-              Podés usar esta funcionalidad para obtener los datos del producto sacando una foto con la cámara del celular.
-              Buscá en la caja del producto los datos de alto, ancho, largo, peso y sacále una foto.
-            </Text>}
-          >
-          <View style={styles.ocrInfoContainer}>
-            <Icon
-              name='info-with-circle'
-              size={20}
-              color='grey'
-              type='entypo'
-            />
-          </View>
-          </Tooltip>
         </View>
         <View style={styles.halfInputRow}>
           <Input

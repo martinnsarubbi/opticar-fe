@@ -33,7 +33,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   RCTAppSetupPrepareApp(application);
-  [GMSServices provideAPIKey:@"AIzaSyCtyfooPfBb7rKut4ZwGL-We1fyxeN5S6I"];
+  [GMSServices provideAPIKey:@"AAIzaSyBCDTIClAeKn1tfHw3db7kQLRTtD9dD2q8"];
   RCTBridge *bridge = [self.reactDelegate createBridgeWithDelegate:self launchOptions:launchOptions];
 
 #if RCT_NEW_ARCH_ENABLED

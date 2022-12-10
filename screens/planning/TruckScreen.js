@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, FlatList, Text, Pressable } from 'react-native';
 import { CheckBox } from '@rneui/themed';
 import SearchComponent from '../../components/SearchComponent';
-import { fetchDeliveries } from '../../util/http';
 import Button from '../../components/Button'
 import AddButton from '../../components/AddButton';
 
@@ -20,7 +19,7 @@ function TruckScreen({ navigation, route }) {
   }, [navigation])
   
   function trucksPressHandler(itemData) {
-    navigation.navigate('Detalle del transporte', { itemData })
+    navigation.navigate('Nuevo transporte', { itemData })
   }
 
   useEffect(() => {
@@ -35,9 +34,9 @@ function TruckScreen({ navigation, route }) {
                 x.searchField.toLowerCase().includes(searchText.toLowerCase())
           )
         : trucks;
-
+      console.log(trucks);
       setTrucks(trucks);
-      setFlatItems(searchFilteredData)
+      setFlatItems(trucks)
 
     } catch(error) {
       console.log('No se pudieron obtener las entregas.')
@@ -51,7 +50,7 @@ function TruckScreen({ navigation, route }) {
               x.searchField.toLowerCase().includes(searchText.toLowerCase())
         )
       : trucks;
-      setFlatItems(searchFilteredData)
+      setFlatItems(trucks)
     }
     getSearchFilterData();
   }, [searchText]);

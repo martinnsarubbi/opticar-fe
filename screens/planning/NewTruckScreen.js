@@ -13,19 +13,19 @@ import DatePicker from 'react-native-date-picker';
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.']);
 
-function NewTruckScreen({ navigation }) {
+function NewTruckScreen({ navigation, route }) {
 
   const [loaded, setLoaded] = useState(false)
   const [inputValues, setInputValues] = useState({ 
-    licensePlate:'',
-    description: '',
-    width: '',
-    maximumWeightCapacity: '',
-    height: '',
-    length: '',
-    driverName: '',
-    driverSurname: '',
-    dni: ''
+    licensePlate: (route.params?.itemData?.licensePlate !== '') ? route.params?.itemData?.licensePlate : '',
+    description: (route.params?.itemData?.truckDescription !== '') ? route.params?.itemData?.truckDescription : '',
+    width: (route.params?.itemData?.width !== '') ? route.params?.itemData?.width.toString() : '',
+    maximumWeightCapacity: (route.params?.itemData?.maximumWeightCapacity !== '') ? route.params?.itemData?.maximumWeightCapacity.toString() : '',
+    height: (route.params?.itemData?.height !== '') ? route.params?.itemData?.height.toString() : '',
+    length: (route.params?.itemData?.length !== '') ? route.params?.itemData?.length.toString() : '',
+    driverName: (route.params?.itemData?.driverName !== '') ? route.params?.itemData?.driverName : '',
+    driverSurname: (route.params?.itemData?.driverSurname !== '') ? route.params?.itemData?.driverSurname : '',
+    dni: (route.params?.itemData?.dni !== '') ? route.params?.itemData?.dni : '',
   });
 
   function inputChangedHandler(inputIdentifier, enteredValue) {

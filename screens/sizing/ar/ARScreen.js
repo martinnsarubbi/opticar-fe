@@ -157,6 +157,7 @@ const MeasureSceneAR = ({ arSceneNavigator }) => {
     let dimension = (Math.round(distanceMeters*10000)/100)
     console.log("alert present:" + this.alertPresent)
     if (!this.alertPresent) {
+      this.alertPresent = true;
       Alert.alert(
         "Medición realizada",
         "Se ha realizado una medición por " + dimension + "cm. Desea confirmarla como alguna de estas medidas?",
@@ -166,6 +167,7 @@ const MeasureSceneAR = ({ arSceneNavigator }) => {
             onPress: () => {
               setBoxHeight(dimension);
               reset();
+              this.alertPresent = false;
             }
           },
           {
@@ -173,6 +175,7 @@ const MeasureSceneAR = ({ arSceneNavigator }) => {
             onPress: () => {
               setBoxWidth(dimension);
               reset();
+              this.alertPresent = false;
             }
           },
           {
@@ -180,12 +183,16 @@ const MeasureSceneAR = ({ arSceneNavigator }) => {
             onPress: () => {
               setBoxLength(dimension);
               reset();
+              this.alertPresent = false;
             }
           },
           {
             text: "Realizar nueva medición",
             style: "cancel",
-            onPress: () => reset()
+            onPress: () => { 
+              reset();
+              this.alertPresent = false;
+            }
           },
         ]
       );

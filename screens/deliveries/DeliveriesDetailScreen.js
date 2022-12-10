@@ -20,13 +20,13 @@ function DeliveriesDetailScreen(props, { navigation }) {
     productId: props.route.params.itemData.productId,
     productName: props.route.params.itemData.productName,
     productCategory: props.route.params.itemData.productCategory,
-    productWeight: props.route.params.itemData.productWeight.toString(),
-    productWidth: props.route.params.itemData.productWidth.toString(),
-    productHeight: props.route.params.itemData.productHeight.toString(),
-    productLength: props.route.params.itemData.productLength.toString(),
-    productStackability: (props.route.params.itemData.productStackability === 'Si') ? true : false,
-    productFragility: (props.route.params.itemData.productFragility === 'Si') ? true : false,
-    productRotability: (props.route.params.itemData.productRotability === 'Si') ? true: false,
+    productWeight: props.route.params.itemData.productWeight,
+    productWidth: props.route.params.itemData.productWidth,
+    productHeight: props.route.params.itemData.productHeight,
+    productLength: props.route.params.itemData.productLength,
+    productStackability: props.route.params.itemData.productStackability,
+    productFragility: props.route.params.itemData.productFragility,
+    productRotability: props.route.params.itemData.productRotability,
     deliveryid: props.route.params.itemData.deliveryid,
     status: props.route.params.itemData.status,
     deliveryDate: props.route.params.itemData.deliveryDate,
@@ -227,7 +227,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
               placeholder='-'
               textInputConfig={{
                 editable: false,
-                value: marker.productHeight
+                value: marker.productHeight.toString()
               }}
               style={styles.allInputRow}
             />
@@ -236,7 +236,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
               placeholder='-'
               textInputConfig={{
                 editable: false,
-                value: marker.productWidth
+                value: marker.productWidth.toString()
               }}
               style={styles.allInputRow}
             />
@@ -247,7 +247,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
               placeholder='-'
               textInputConfig={{
                 editable: false,
-                value: marker.productHeight
+                value: marker.productLength.toString()
               }}
               style={styles.allInputRow}
             />
@@ -256,7 +256,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
               placeholder='-'
               textInputConfig={{
                 editable: false,
-                value: marker.productWeight
+                value: marker.productWeight.toString()
               }}
               style={styles.allInputRow}
             />
@@ -331,7 +331,7 @@ function DeliveriesDetailScreen(props, { navigation }) {
                 center
                 accessibilityRole='button'
                 title="Rotable"
-                checked={marker.productRotabiltiy}
+                checked={marker.productRotability}
               />
               <Tooltip
                 visible={rotabilityTooltipOpen}

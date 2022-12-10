@@ -70,9 +70,6 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
     deliveryObj.productWidth = (deliveryObj.productWidth === 0) ? '' : deliveryObj.productWidth;
     deliveryObj.productHeight = (deliveryObj.productHeight === 0) ? '' : deliveryObj.productHeight;
     deliveryObj.productLength = (deliveryObj.productLength === 0) ? '' : deliveryObj.productLength;
-    deliveryObj.productFragility = (deliveryObj.productFragility === 'true') ? true : false;
-    deliveryObj.productStackability = (deliveryObj.productStackability === 'true') ? true : false;
-    deliveryObj.productRotability = (deliveryObj.productRotability === 'true') ? true : false;
     deliveries.push(deliveryObj);
   }
   return deliveries;
@@ -80,6 +77,11 @@ export async function fetchDeliveries(planningPending, sizingPending ) {
 
 export async function storeDelivery(deliveryData) {
   console.log(BACKEND_URL + '/api/bulk-upload')
+  deliveryData.weight = parseFloat(deliveryData.weight);
+  deliveryData.height = parseFloat(deliveryData.height);
+  deliveryData.width = parseFloat(deliveryData.width);
+  deliveryData.large = parseFloat(deliveryData.large);
+  console.log(deliveryData);
   const deliveryDataList = []
   deliveryDataList.push(deliveryData)
   const response = await axios.post(BACKEND_URL + '/api/bulk-upload', deliveryDataList);
@@ -101,6 +103,9 @@ export async function fetchTrucks() {
       length: response.data[key].length,
       height: response.data[key].height,
       maximumWeightCapacity: response.data[key].maximumWeightCapacity,
+      driverName: response.data[key].driverName,
+      driverSurname: response.data[key].driverSurname,
+      dni: response.data[key].dni,
       searchField: response.data[key].truckDescription + ',' + response.data[key].licensePlate,
       checkedForPlanning: false
     }

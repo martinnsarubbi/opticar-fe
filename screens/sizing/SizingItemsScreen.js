@@ -41,6 +41,7 @@ function SizingItemsScreen({ navigation, route }) {
   useEffect(() => {
     const unsuscribe = navigation.addListener("focus", () => {
       getDeliveries();
+      withoutSizingChipPressHandler();
     });
     return unsuscribe;
   }, [navigation])

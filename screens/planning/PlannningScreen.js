@@ -31,9 +31,14 @@ function PlanningScreen({ navigation, route }) {
   const [deliveryCount, setDeliveryCount] = useState(0);
   const [truckCount, setTrucksCount] = useState(0);
   const [deliveriesFetched, setDeliveriesFetched] = useState(false);
+  const [allDeliveries, setAllDeliveries] = useState();
   const [trucksFetched, setTrucksFetched] = useState(false);
   const [inputValues, setInputValues] = useState({
-    deliveryDate: '',
+    deliveryDate: ([
+      padTo2Digits(new Date().getDate()),
+      padTo2Digits(new Date().getMonth() + 1),
+      new Date().getFullYear(),
+    ].join('/')),
     latitude: '',
     longitude: '',
     address: '',
@@ -102,7 +107,6 @@ function PlanningScreen({ navigation, route }) {
       let deliveriesList = null;
       if (!deliveriesFetched) {
         deliveriesList = await fetchDeliveries(true, false);
-        console.log(deliveriesList);
         setDeliveriesFetched(true)
       } else {
         deliveriesList = input;
@@ -123,9 +127,11 @@ function PlanningScreen({ navigation, route }) {
           setMarkers(prevState => [...prevState, coordinatesObj]);
         }
       }
-
+      setAllDeliveries(deliveriesList)
+      console.log(deliveriesList)
+      console.log(inputValues.deliveryDate)
       setDeliveryCount(deliveryCounter)
-      setDeliveries(deliveriesList);
+      setDeliveries(deliveriesList.filter((obj) => obj.deliveryDate === inputValues.deliveryDate));
     } catch (error) {
       console.log('Error: ' + error)
     }
@@ -171,8 +177,6 @@ function PlanningScreen({ navigation, route }) {
       latitude: details.geometry.location.lat,
       longitude: details.geometry.location.lng
     })
-
-    console.log(originLocation);
 
     setInputValues((curInputValues) => ({
       ...curInputValues,
@@ -406,6 +410,11 @@ function PlanningScreen({ navigation, route }) {
                 date.getFullYear(),
               ].join('/')
             }))
+            setDeliveries(allDeliveries.filter((obj) => obj.deliveryDate === [
+              padTo2Digits(date.getDate()),
+              padTo2Digits(date.getMonth() + 1),
+              date.getFullYear(),
+            ].join('/')));
           }}
           onCancel={() => {
             setOpenDatePicker(false)

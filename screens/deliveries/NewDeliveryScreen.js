@@ -42,10 +42,10 @@ function NewDeliveryScreen({ navigation }) {
     barcode: '',
     description: '',
     category: '',
-    weight: '',
-    width: '',
-    height: '',
-    large: '',
+    weight: 0,
+    width: 0,
+    height: 0,
+    large: 0,
     stackability: false,
     fragility: false,
     rotability: false,
@@ -61,7 +61,7 @@ function NewDeliveryScreen({ navigation }) {
         let deliveries = await fetchDeliveries(true, true);
         const searchFilteredData = inputValues.barcode
           ? deliveries.filter((x) =>
-                  x.productId.includes(inputValues.barcode)
+                  x.productId == inputValues.barcode
             )
           : null;
         if(searchFilteredData != null) {
@@ -70,10 +70,10 @@ function NewDeliveryScreen({ navigation }) {
               ...curInputValues,
               description: searchFilteredData[0].productName,
               category: searchFilteredData[0].productCategory,
-              weight: searchFilteredData[0].productWeight.toString(),
-              width: searchFilteredData[0].productWidth.toString(),
-              height: searchFilteredData[0].productHeight.toString(),
-              large: searchFilteredData[0].productLength.toString(),
+              weight: searchFilteredData[0].productWeight,
+              width: searchFilteredData[0].productWidth,
+              height: searchFilteredData[0].productHeight,
+              large: searchFilteredData[0].productLength,
               stackability: searchFilteredData[0].productStackability,
               fragility: searchFilteredData[0].productFragility,
               rotability: searchFilteredData[0].productRotability
@@ -84,6 +84,7 @@ function NewDeliveryScreen({ navigation }) {
         console.log(error)
       }
     }
+    console.log(inputValues)
     updateProduct();
   }, [inputValues.barcode]);
 
@@ -126,6 +127,7 @@ function NewDeliveryScreen({ navigation }) {
 
   async function submitHandler() {
     console.log(inputValues)
+
     const id = await storeDelivery(inputValues);
     navigation.navigate('Entregas');
   }
