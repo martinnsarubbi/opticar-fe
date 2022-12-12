@@ -10,9 +10,20 @@ function DeliveriesSelectionScreen({ navigation, route }) {
   const [deliveries, setDeliveries] = useState();
   const [searchText, setSearchText] = useState();
   const [flatItems, setFlatItems] = useState();
+  const [newDeliveries, setNewDeliveries] = useState();
 
   useEffect(() => {
-    const unsuscribe = navigation.addListener("focus", () => {
+    const unsuscribe = navigation.addListener("focus", async () => {
+      const deliveriesList = await fetchDeliveries(true, false);
+      for(var i = 0; i < route.params.deliveries.length; i++) {
+        for(var j = 0; j < deliveriesList.length; j++) {
+          if (route.params.deliveries[i].deliveryid === deliveriesList[j].deliveryid) {
+            if(route.params.deliveries[i].deliveryDate !== deliveriesList[j].deliveryDate) {
+              route.params.deliveries[i].deliveryDate = deliveriesList[j].deliveryDate;
+            }
+          }
+        }
+      }
       getDeliveries(route.params.deliveries);
     });
     return unsuscribe;

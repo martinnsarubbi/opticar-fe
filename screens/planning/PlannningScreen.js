@@ -33,6 +33,7 @@ function PlanningScreen({ navigation, route }) {
   const [deliveriesFetched, setDeliveriesFetched] = useState(false);
   const [allDeliveries, setAllDeliveries] = useState();
   const [trucksFetched, setTrucksFetched] = useState(false);
+  const [deliveriesNotLoaded, setDeliveriesNotLoaded] = useState()
   const [inputValues, setInputValues] = useState({
     deliveryDate: ([
       padTo2Digits(new Date().getDate()),
@@ -102,6 +103,7 @@ function PlanningScreen({ navigation, route }) {
     }
   }, [])
 
+
   async function getDeliveries(input) {
     try {
       let deliveriesList = null;
@@ -109,7 +111,18 @@ function PlanningScreen({ navigation, route }) {
         deliveriesList = await fetchDeliveries(true, false);
         setDeliveriesFetched(true)
       } else {
+        let deliveriesList2 = await fetchDeliveries(true, false);
         deliveriesList = input;
+        
+        for(var i = 0; i < deliveriesList.length; i++) {
+          for(var j = 0; j < deliveriesList2.length; j++) {
+            if (deliveriesList[i].deliveryid === deliveriesList2[j].deliveryid) {
+              if(deliveriesList[i].deliveryDate !== deliveriesList2[j].deliveryDate) {
+                deliveriesList[i].deliveryDate == deliveriesList2[j].deliveryDate;
+              }
+            }
+          }
+        }
       }
       const markers = [];
       let deliveryCounter = 0;
@@ -128,8 +141,6 @@ function PlanningScreen({ navigation, route }) {
         }
       }
       setAllDeliveries(deliveriesList)
-      console.log(deliveriesList)
-      console.log(inputValues.deliveryDate)
       setDeliveryCount(deliveryCounter)
       setDeliveries(deliveriesList.filter((obj) => obj.deliveryDate === inputValues.deliveryDate));
     } catch (error) {
@@ -252,6 +263,33 @@ function PlanningScreen({ navigation, route }) {
         planDate: [date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('')
       }
       let response = await planningAlgorithm(planningData);
+      //Entregas que quedaron fuera
+      for(var i = 0; i < response.length; i++){
+        if(response[i].status === "Sin entrega") {
+          let notLoaded = []
+          for(var j = 0; j < response[i].load.length; j++) {
+            console.log(response[i].load[j].orderedDelivery.delivery.id);
+            notLoaded.push(response[i].load[j].orderedDelivery.delivery.id);
+          }
+          setDeliveriesNotLoaded(notLoaded);
+
+          const AsyncAlert = async () => new Promise((resolve) => {
+            Alert.alert("No se han incluido en el plan la(s) entrega(s) " + deliveriesNotLoaded.join(', '),
+            "Si confirma el plan, estas entregas serán replanificadas para el día de mañana. De lo contrario puede cancelar el plan y elegir otro(s) transporte(s) para poder incluir las entregas faltantes",
+            [{
+              text: "OK",
+              onPress: async () => {
+                resolve('YES')
+              },
+            }])
+          });
+
+          await AsyncAlert()
+
+          response.splice(i, 1);
+        }
+      }
+
       setPlan(response);
       setIsPlanningModalVisible(true);
       //setTimeout(() => {
@@ -275,6 +313,7 @@ function PlanningScreen({ navigation, route }) {
       )
     }
   }
+
 
   const renderHorizontalItem = ({item}) => (
     <View style={{flex: 1, backgroundColor: 'white', width: 100, height: 100, flexDirection: 'column', alignItems:'center', padding: 10, margin: 10, borderRadius: 10, shadowColor: 'black', shadowOpacity: 1}}>
@@ -401,7 +440,6 @@ function PlanningScreen({ navigation, route }) {
           onConfirm={(date) => {
             setOpenDatePicker(false)
             setDate(date)
-            console.log(date)
             setInputValues((curInputValues) => ({
               ...curInputValues,
               deliveryDate: [
@@ -486,7 +524,7 @@ function PlanningScreen({ navigation, route }) {
                 backgroundColor='white'
                 overlayColor='#93a2b899'
                 popover={<Text>
-                  Elegí las entregas que vas a planificar.
+                  Elegí las entregas que vas a planificar en la fecha seleccionada.
                 </Text>}
               >
                 <Icon

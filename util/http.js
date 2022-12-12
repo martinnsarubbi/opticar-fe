@@ -25,7 +25,7 @@ export async function fetchProducts() {
 }
 
 
-export async function fetchDeliveries(planningPending, sizingPending ) {
+export async function fetchDeliveries(planningPending, sizingPending) {
   let url = BACKEND_URL + '/api/deliveries?status1='
   if (planningPending === true && sizingPending === true) {
     url = url + 'Pendiente de planificar&status2=Pendiente de dimensionar'
@@ -115,6 +115,7 @@ export async function fetchTrucks() {
 }
 
 export async function planningAlgorithm(planningInfo) {
+  console.log(planningInfo);
   let url = BACKEND_URL + '/api/planning-algorithm';
   const response = await axios.post(url, planningInfo);
   console.log(response.toString());
@@ -159,4 +160,10 @@ export async function addToMLTable(delivery, reason) {
   let url = BACKEND_URL + '/api/delivery/' + delivery + '/' + reason;
   const response = await axios.put(url);
   return response.data;
+}
+
+export async function changeDeliveryDate(deliveryDateList) {
+  console.log(deliveryDateList)
+  const response = await axios.post(BACKEND_URL + '/api/deliveries/changeDeliveryDate', deliveryDateList);
+  return response;
 }

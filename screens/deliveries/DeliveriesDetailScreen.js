@@ -3,7 +3,10 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { CheckBox, Icon, Tooltip } from '@rneui/themed';
 import { getLocationDetailsFromGoogleMapsJSON } from '../../util/location';
+import { changeDeliveryDate } from '../../util/http';
 import Input from '../../components/Input';
+import DatePicker from 'react-native-date-picker';
+
 
 function DeliveriesDetailScreen(props, { navigation }) {
   const [marker, setMarker] = useState({ 
@@ -33,6 +36,9 @@ function DeliveriesDetailScreen(props, { navigation }) {
     latitudeDelta: 0.0059,
     longitudeDelta: 0.0059,
   });
+  const [date, setDate] = useState(new Date( props.route.params.itemData.deliveryDate.split('/')[2], props.route.params.itemData.deliveryDate.split('/')[1] - 1, props.route.params.itemData.deliveryDate.split('/')[0]));
+  const [dateString, setDateString] = useState(props.route.params.itemData.deliveryDate);
+  const [open, setOpen] = useState(false);
   const [fragileTooltipOpen, setFragileTooltipOpen] = useState(false); 
   const [stackabilityTooltipOpen, setStackabilityTooltipOpen] = useState(false);
   const [rotabilityTooltipOpen, setRotableTooltipOpen] = useState(false);
@@ -55,6 +61,10 @@ function DeliveriesDetailScreen(props, { navigation }) {
     };
     setMarker(customerDetails);
   };
+
+  function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+  }
 
 
   return (
@@ -176,8 +186,44 @@ function DeliveriesDetailScreen(props, { navigation }) {
             placeholder='dd/mm/yyyy'
             style={styles.allInputRow}
             textInputConfig={{
-              editable: false,
-              value: marker.deliveryDate
+              editable: true,
+              value: dateString
+            }}
+          />
+          <Icon
+              name='calendar'
+              type='material-community'
+              style={styles.barcodeScanIcon}
+              size={30}
+              color='grey'
+              onPress={() => setOpen(true)}
+            />
+          <DatePicker
+            modal
+            open={open}
+            mode="date"
+            date={date}
+            onConfirm={(date) => {
+              setOpen(false)
+              setDate(date)
+              setDateString([
+                padTo2Digits(date.getDate()),
+                padTo2Digits(date.getMonth() + 1),
+                date.getFullYear(),
+              ].join('/'))
+              let delList = []
+              delList.push({
+                deliveryDate: [
+                  padTo2Digits(date.getDate()),
+                  padTo2Digits(date.getMonth() + 1),
+                  date.getFullYear(),
+                ].join('/'),
+                deliveryId: marker.deliveryid
+              })
+              changeDeliveryDate(delList)
+            }}
+            onCancel={() => {
+              setOpen(false)
             }}
           />
         </View>
@@ -431,6 +477,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10
+  },
+  barcodeScanIcon: {
+    marginTop: 25,
+    marginLeft: 10,
   },
 })
 
