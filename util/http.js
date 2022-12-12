@@ -115,10 +115,8 @@ export async function fetchTrucks() {
 }
 
 export async function planningAlgorithm(planningInfo) {
-  console.log(planningInfo);
   let url = BACKEND_URL + '/api/planning-algorithm';
   const response = await axios.post(url, planningInfo);
-  console.log(response.toString());
   return response.data;
 }
 
@@ -129,11 +127,8 @@ export async function storeTruck(truckData) {
 }
 
 export async function savePlan(plan, originLocation) {
-  console.log(plan);
-  console.log(originLocation);
   console.log(BACKEND_URL + '/api/trucks', plan);
   const response = await axios.post(BACKEND_URL + '/api/planning', plan);
-  console.log(response);
   return response;
 }
 
@@ -165,5 +160,10 @@ export async function addToMLTable(delivery, reason) {
 export async function changeDeliveryDate(deliveryDateList) {
   console.log(deliveryDateList)
   const response = await axios.post(BACKEND_URL + '/api/deliveries/changeDeliveryDate', deliveryDateList);
+  return response;
+}
+
+export async function loadTruck(deliveriesId) {
+  const response = await axios.post(BACKEND_URL + '/api/truck-loaded', deliveriesId);
   return response;
 }

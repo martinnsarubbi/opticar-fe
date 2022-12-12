@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable, Image, FlatList, Alert } from 'react
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Icon, Tooltip } from '@rneui/themed';
 import DatePicker from 'react-native-date-picker';
-import { fetchDeliveries, fetchTrucks, planningAlgorithm, savePlan, getPlan, deletePlan } from '../../util/http';
+import { fetchDeliveries, fetchTrucks, planningAlgorithm, savePlan, getPlan, deletePlan, changeDeliveryDate } from '../../util/http';
 import Button from '../../components/Button';
 import CancelButton from '../../components/CancelButton';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -77,6 +77,8 @@ function PlanningScreen({ navigation, route }) {
   function handleOkPlanningModal(){
     setIsOkPlanningModalVisible(() => !isOkPlanningModalVisible);
     response = savePlan(plan, originLocation);
+    console.log(deliveriesNotLoaded);
+    response = changeDeliveryDate(deliveriesNotLoaded)
   }
   function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
@@ -263,18 +265,26 @@ function PlanningScreen({ navigation, route }) {
         planDate: [date.getFullYear(),  padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('')
       }
       let response = await planningAlgorithm(planningData);
+      let tomorrowDate = new Date();
+      tomorrowDate.setDate(date.getDate() +1);
+      console.log(tomorrowDate);
       //Entregas que quedaron fuera
       for(var i = 0; i < response.length; i++){
         if(response[i].status === "Sin entrega") {
           let notLoaded = []
+          let notLoadedDel = []
           for(var j = 0; j < response[i].load.length; j++) {
-            console.log(response[i].load[j].orderedDelivery.delivery.id);
-            notLoaded.push(response[i].load[j].orderedDelivery.delivery.id);
+            console.log([padTo2Digits(tomorrowDate.getDate()), padTo2Digits(tomorrowDate.getMonth()+1), tomorrowDate.getFullYear(),].join('/'));
+            notLoaded.push({
+              deliveryId: response[i].load[j].orderedDelivery.delivery.id,
+              deliveryDate: [padTo2Digits(tomorrowDate.getDate()), padTo2Digits(tomorrowDate.getMonth()+1), tomorrowDate.getFullYear(),].join('/')
+            });
+            notLoadedDel.push(response[i].load[j].orderedDelivery.delivery.id);
           }
           setDeliveriesNotLoaded(notLoaded);
-
+          
           const AsyncAlert = async () => new Promise((resolve) => {
-            Alert.alert("No se han incluido en el plan la(s) entrega(s) " + deliveriesNotLoaded.join(', '),
+            Alert.alert("No se han incluido en el plan la(s) entrega(s) " + notLoadedDel.join(', '),
             "Si confirma el plan, estas entregas serán replanificadas para el día de mañana. De lo contrario puede cancelar el plan y elegir otro(s) transporte(s) para poder incluir las entregas faltantes",
             [{
               text: "OK",
